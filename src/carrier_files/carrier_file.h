@@ -16,22 +16,19 @@
 #include <string>
 #include <typeinfo>
 
-#include "encoders/encoder_factory.h"
-#include "fitness/fitness.h"
 #include "keys/key.h"
-#include "logging/logger.h"
-#include "permutations/permutation.h"
-#include "permutations/permutation_factory.h"
-#include "utils/config.h"
 #include "utils/file.h"
-#include "utils/memory_buffer.h"
 #include "utils/stego_types.h"
-#include "virtual_storage/virtual_storage.h"
-
 
 namespace stego_disk {
 
-
+	/**
+	 *  Forward declarations
+	 */
+	class Encoder;
+	class Permutation;
+	class Fitness;
+	class VirtualStorage;
 
 /**
  * The CarrierFile class.

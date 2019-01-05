@@ -8,13 +8,14 @@
 */
 
 #include "carrier_file_png.h"
+#include "utils/exceptions.h"
+#include "utils/stego_errors.h"
+#include "logging/logger.h"
+#include "permutations/permutation.h"
+#include "fitness/fitness.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#include "utils/exceptions.h"
-#include "utils/stego_errors.h"
-
 
 namespace stego_disk {
 

@@ -8,9 +8,6 @@
 */
 
 #include "permutation.h"
-
-#include <string.h> // memset
-
 #include "utils/exceptions.h"
 
 namespace stego_disk {

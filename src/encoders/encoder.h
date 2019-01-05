@@ -13,7 +13,6 @@
 #include <string>
 #include <stdexcept>
 
-#include "api_mask.h"
 #include "utils/stego_types.h"
 
 namespace stego_disk {

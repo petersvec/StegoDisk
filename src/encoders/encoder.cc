@@ -9,7 +9,6 @@
 
 #include "encoder.h"
 
-
 namespace stego_disk {
 
 /**

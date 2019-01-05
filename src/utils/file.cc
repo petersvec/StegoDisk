@@ -17,17 +17,15 @@
 #error Unsupported OS
 #endif
 
+#include "stego_header.h"
+#include "utils/exceptions.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
-
 #include <algorithm>
 #include <stdexcept>
 #include <fstream>
-
-#include "api_mask.h"
-#include "stego_header.h"
-#include "utils/exceptions.h"
 
 namespace stego_disk {
 

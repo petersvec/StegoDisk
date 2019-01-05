@@ -1,6 +1,5 @@
 #include "exceptions.h"
 
-#include "api_mask.h"
 
 namespace stego_disk {
 namespace exception {

@@ -8,18 +8,17 @@
 */
 
 #include "carrier_file_jpeg.h"
+#include "utils/exceptions.h"
+#include "utils/stego_errors.h"
+#include "utils/stego_math.h"
+#include "permutations/permutation.h"
+#include "fitness/fitness.h"
 
 #include <errno.h>
 #include <math.h>
 #include <setjmp.h>
 #include <stdio.h>
 #include <string.h>
-
-#include <iostream>
-
-#include "utils/exceptions.h"
-#include "utils/stego_errors.h"
-#include "utils/stego_math.h"
 
 #define COLOR_SPACE 1 //YCbCr
 

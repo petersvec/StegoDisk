@@ -8,9 +8,6 @@
 */
 
 #include "keys/key.h"
-
-#include <string.h> // memset
-
 #include "api_mask.h"
 #include "hash/hash.h"
 

@@ -8,11 +8,6 @@
 */
 
 #include "feistel_num_permutation.h"
-
-#include <math.h>       /* sqrt */
-
-#include <algorithm>
-
 #include "hash/hash.h"
 #include "logging/logger.h"
 #include "utils/config.h"
@@ -20,6 +15,9 @@
 #include "utils/keccak/keccak.h"
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
+
+#include <math.h>
+#include <algorithm>
 
 constexpr auto MinReqSize = 1024;
 constexpr auto NumRounds = 5;

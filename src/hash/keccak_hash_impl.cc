@@ -8,12 +8,11 @@
 */
 
 #include "keccak_hash_impl.h"
-
-#include <stdexcept>
-
 #include "api_mask.h"
 #include "utils/exceptions.h"
 #include "utils/keccak/keccak.h"
+
+#include <stdexcept>
 
 namespace stego_disk {
 

@@ -8,14 +8,13 @@
 */
 
 #include "stego_storage.h"
-
-#include <fstream>
-
 #include "api_mask.h"
 #include "file_management/carrier_files_manager.h"
 #include "utils/exceptions.h"
 #include "utils/stego_config.h"
 #include "virtual_storage/virtual_storage.h"
+
+#include <fstream>
 
 namespace stego_disk {
 

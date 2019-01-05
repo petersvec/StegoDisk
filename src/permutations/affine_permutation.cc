@@ -8,7 +8,6 @@
 */
 
 #include "affine_permutation.h"
-
 #include "logging/logger.h"
 #include "utils/config.h"
 #include "utils/exceptions.h"

@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include "api_mask.h"
 #include "encoder.h"
 
 constexpr auto EncoderHammingCodeNameDef = "Hamming";

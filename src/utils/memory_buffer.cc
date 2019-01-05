@@ -8,18 +8,16 @@
 */
 
 #include "memory_buffer.h"
+#include "api_mask.h"
+#include "stego_types.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <string.h>
 #include <algorithm>
 #include <exception>
 #include <stdexcept>
 #include <ctime>
-
-#include "api_mask.h"
-#include "stego_types.h"
 
 namespace stego_disk {
 

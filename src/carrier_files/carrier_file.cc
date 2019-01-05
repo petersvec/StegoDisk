@@ -8,13 +8,6 @@
 */
 
 #include "carrier_file.h"
-
-#include <stdio.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <algorithm>
-#include <assert.h>
-
 #include "encoders/encoder.h"
 #include "permutations/permutation_factory.h"
 #include "utils/config.h"
@@ -22,6 +15,15 @@
 #include "utils/keccak/keccak.h"
 #include "utils/stego_errors.h"
 #include "utils/stego_header.h"
+#include "virtual_storage/virtual_storage.h"
+#include "fitness/fitness.h"
+#include "permutations/permutation.h"
+
+#include <stdio.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <algorithm>
+#include <assert.h>
 
 namespace stego_disk {
 

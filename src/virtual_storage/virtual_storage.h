@@ -12,11 +12,13 @@
 #include <memory>
 
 #include "utils/stego_types.h"
-#include "permutations/permutation_factory.h"
 #include "keys/key.h"
 
-
 namespace stego_disk {
+	/**
+	 * Forward declarations
+	 */
+	class Permutation;
 
 /**
  * Main storage buffer that utilizes global permutation in readByte/writeByte ops

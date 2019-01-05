@@ -8,9 +8,6 @@
 */
 
 #include "carrier_file_factory.h"
-
-#include <algorithm>
-
 #include "carrier_file.h"
 #include "carrier_file_bmp.h"
 #include "carrier_file_jpeg.h"
@@ -18,6 +15,9 @@
 #include "encoders/encoder_factory.h"
 #include "permutations/permutation_factory.h"
 #include "utils/stego_config.h"
+#include "fitness/fitness.h"
+
+#include <algorithm>
 
 namespace stego_disk {
 

@@ -14,8 +14,6 @@
 #include <stdint.h>
 
 #include "carrier_file.h"
-#include "logging/logger.h"
-
 
 // jpeglib must be includes AFTER all precedense files
 // because in VS2010 is included BaseTsd.h, which defines INT32 type

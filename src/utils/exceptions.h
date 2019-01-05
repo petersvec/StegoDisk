@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "api_mask.h"
 #include "stego-disk_export.h"
 
 #define DEFINE_GETTER(member_name) \
@@ -128,8 +127,7 @@ class STEGO_DISK_EXPORT ZeroAllocatedSize : public std::bad_array_new_length {
 public:
 	ZeroAllocatedSize() {}
 
-	virtual const char * what() const noexcept { return "Size of new created "
-		                                                "buffer is zero"; }
+	virtual const char * what() const noexcept override { return "Size of new created buffer is zero"; }
 
 	virtual ~ZeroAllocatedSize() {}
 };
@@ -228,8 +226,7 @@ class STEGO_DISK_EXPORT FuctionNotImplementad : public std::exception {
 public:
     FuctionNotImplementad() {}
 
-	virtual const char * what() const noexcept { return "This function is not "
-		                                                "implemented yet"; }
+	virtual const char * what() const noexcept override { return "This function is not implemented yet"; }
 
 	virtual ~FuctionNotImplementad() {}
 };

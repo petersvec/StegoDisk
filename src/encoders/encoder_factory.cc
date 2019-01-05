@@ -8,14 +8,13 @@
 */
 
 #include "encoder_factory.h"
-
-#include <algorithm>
-
 #include "api_mask.h"
 #include "encoder.h"
 #include "hamming_encoder.h"
 #include "lsb_encoder.h"
 #include "utils/exceptions.h"
+
+#include <algorithm>
 
 namespace stego_disk {
 

@@ -12,7 +12,6 @@
 #include <iostream>
 #include <memory>
 
-#include "logging/logger.h"
 #include "utils/file.h"
 
 namespace stego_disk {

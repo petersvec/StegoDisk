@@ -11,8 +11,6 @@
 
 #include <cstdint>
 
-#include "api_mask.h"
-
 namespace stego_disk {
 	using uint8 = std::uint8_t;
 	using uint16 = std::uint16_t;

@@ -12,7 +12,6 @@
 #include <string>
 #include <memory>
 
-#include "api_mask.h"
 #include "utils/memory_buffer.h"
 
 namespace stego_disk {

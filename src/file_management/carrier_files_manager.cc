@@ -8,17 +8,6 @@
 */
 
 #include "carrier_files_manager.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-#include <algorithm>
-#include <iostream>
-#include <string>
-#include <vector>
-
 #include "api_mask.h"
 #include "carrier_files/carrier_file.h"
 #include "carrier_files/carrier_file_factory.h"
@@ -32,6 +21,15 @@
 #include "utils/stego_math.h"
 #include "utils/thread_pool.h"
 #include "virtual_storage/virtual_storage.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <algorithm>
+#include <iostream>
+#include <string>
+#include <vector>
 
 namespace stego_disk {
 

@@ -8,7 +8,6 @@
 */
 
 #include "identity_permutation.h"
-
 #include "utils/exceptions.h"
 #include "utils/stego_header.h"
 

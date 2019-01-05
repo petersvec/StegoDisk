@@ -8,14 +8,12 @@
 */
 
 #include "stego_math.h"
+#include "api_mask.h"
 
 #include <stdlib.h>
 #include <stdio.h>
-
 #include <sstream>
 #include <iomanip>
-
-#include "api_mask.h"
 
 namespace stego_disk {
 
