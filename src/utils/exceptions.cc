@@ -1,18 +1,18 @@
 #include "exceptions.h"
 
 
-namespace stego_disk {
-namespace exception {
+namespace stego_disk::exception 
+{
 
-InvalidState::InvalidState(const Operation & operation, const Component & component, const ComponentState & state) :
-	std::runtime_error{"Required operation '"+to_string(operation)+"' can not be applied because of current state '"+to_string(state)+"' of the component '"+to_string(component)+"'"},
-	operation_{operation},
-	component_{component},
-	state_{state}
-{}
+	InvalidState::InvalidState(const Operation & operation, const Component & component, const ComponentState & state) :
+		std::runtime_error{ "Required operation '" + to_string(operation) + "' can not be applied because of current state '" + to_string(state) + "' of the component '" + to_string(component) + "'" },
+		operation_{ operation },
+		component_{ component },
+		state_{ state }
+	{}
 
-std::string to_string(const InvalidState::Component & component) {
-	switch (component) {
+	std::string to_string(const InvalidState::Component & component) {
+		switch (component) {
 		case InvalidState::Component::storage:
 			return "Storage";
 		case InvalidState::Component::encoder:
@@ -25,12 +25,12 @@ std::string to_string(const InvalidState::Component & component) {
 			return "Thread pool";
 		case InvalidState::Component::file:
 			return "File";
+		}
+		throw std::invalid_argument{ "component" };
 	}
-	throw std::invalid_argument{"component"};
-}
 
-std::string to_string(const InvalidState::ComponentState & state) {
-	switch (state) {
+	std::string to_string(const InvalidState::ComponentState & state) {
+		switch (state) {
 		case InvalidState::ComponentState::notInitialized:
 			return "Not initialized";
 		case InvalidState::ComponentState::notSetted:
@@ -49,12 +49,12 @@ std::string to_string(const InvalidState::ComponentState & state) {
 			return "Not applied";
 		case InvalidState::ComponentState::stopped:
 			return "Stopped";
+		}
+		throw std::invalid_argument{ "state" };
 	}
-	throw std::invalid_argument{"state"};
-}
 
-std::string to_string(const InvalidState::Operation & operation) {
-	switch (operation) {
+	std::string to_string(const InvalidState::Operation & operation) {
+		switch (operation) {
 		case InvalidState::Operation::loadVirtualStorage:
 			return "Load virtual storage";
 		case InvalidState::Operation::saveVirtualStorage:
@@ -81,9 +81,7 @@ std::string to_string(const InvalidState::Operation & operation) {
 			return "Save";
 		case InvalidState::Operation::embedBufferUsingEncoder:
 			return "Embed buffer using encoder";
+		}
+		throw std::invalid_argument{ "operation" };
 	}
-	throw std::invalid_argument{"operation"};
 }
-
-} // exception
-} // stego_disk

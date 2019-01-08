@@ -107,23 +107,24 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
   try { storage->ApplyPermutation(this->GetCapacity(), master_key_); }
   catch (...) { throw; }
 
-  uint64 offset = 0;
-
-  uint64 remaining_capacity = storage->GetRawCapacity();
-
-  uint64 bytes_used;
-
   for (const auto &file : carrier_files_) 
   {
-    if (remaining_capacity > file->GetCapacity()) {
-      remaining_capacity -= file->GetCapacity();
-      bytes_used = file->GetCapacity();
-    } else {
-      bytes_used = remaining_capacity;
-      remaining_capacity = 0;
-    }
-    file->AddToVirtualStorage(storage, offset, bytes_used);
-    offset += file->GetCapacity();
+	  uint64 offset = 0;
+	  uint64 bytes_used;
+	  
+	  if (auto remaining_capacity = storage->GetRawCapacity(); remaining_capacity > file->GetCapacity()) 
+	  {
+		  remaining_capacity -= file->GetCapacity();
+		  bytes_used = file->GetCapacity();
+      }
+	  else 
+	  {
+		  bytes_used = remaining_capacity;
+		  remaining_capacity = 0;
+	  }
+
+	  file->AddToVirtualStorage(storage, offset, bytes_used);
+      offset += file->GetCapacity();	
   }
 
   std::vector<std::future<void>> load_results;
@@ -137,9 +138,9 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
     catch (...) { throw; }
   }
 
-  virtual_storage_ = storage;
   try {
-    if ( virtual_storage_->IsValidChecksum() == false ) {
+    if (virtual_storage_ = storage; virtual_storage_->IsValidChecksum() == false ) 
+	{
       LOG_DEBUG("Data integrity test: checksum is NOT valid");
       return false;
     }
@@ -162,10 +163,10 @@ void CarrierFilesManager::SaveVirtualStorage() {
 
 std::string CarrierFilesManager::CreateFilterFromConfig() const
 {
-	std::string new_filter{ "" };
-
 	if (StegoConfig::initialized())
 	{
+		std::string new_filter{ "" };
+
 		for (auto &format : StegoConfig::include_list())
 		{
 			if (SupportedFormats.find(format) != SupportedFormats.end())
@@ -178,9 +179,13 @@ std::string CarrierFilesManager::CreateFilterFromConfig() const
 		{
 			new_filter.erase(new_filter.length() - 1);
 		}
-	}
 
-	return new_filter;
+		return new_filter;
+	}
+	else
+	{
+		return "";
+	}
 }
 
 void CarrierFilesManager::SetEncoderArg(const std::string &param,

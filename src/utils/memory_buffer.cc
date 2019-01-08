@@ -22,10 +22,12 @@
 namespace stego_disk {
 
 void MemoryBuffer::Init(std::size_t new_size) {
-  size_ = new_size;
-  if (size_ > 0) {
+  if (size_ = new_size; size_ > 0)
+  {
     buffer_ = new uint8[size_];
-  } else {
+  } 
+  else 
+  {
     size_ = 0;
     buffer_ = nullptr;
   }
@@ -117,17 +119,15 @@ bool MemoryBuffer::operator!=(const MemoryBuffer& other) {
 void MemoryBuffer::Resize(std::size_t new_size) {
 
   if (new_size == size_) return;
-
-  uint8* original_buffer = buffer_;
-  std::size_t original_size = size_;
-
   auto* new_buffer = new uint8[new_size];
 
   memset(new_buffer, 0, new_size);
-  if (original_buffer != nullptr) {
-    memcpy(new_buffer, original_buffer, std::min(new_size, original_size));
-    Randomize();
-    delete[] original_buffer;
+  if (uint8* original_buffer = buffer_; original_buffer != nullptr) 
+  {
+	  std::size_t original_size = size_;
+	  memcpy(new_buffer, original_buffer, std::min(new_size, original_size));
+	  Randomize();
+	  delete[] original_buffer;
   }
   size_ = new_size;
   buffer_ = new_buffer;

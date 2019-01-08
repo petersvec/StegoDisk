@@ -29,17 +29,18 @@ CarrierFilePNG::CarrierFilePNG(File file, std::shared_ptr<Encoder> encoder,
   unsigned char png_header[64];
 
   fseek(file_ptr.Get(), 0, SEEK_SET);
-  auto read_cnt = static_cast<int>(fread(&png_header, 1, 64, file_ptr.Get()));
 
 
-  if (read_cnt < 64) {
+  if (auto read_cnt = static_cast<int>(fread(&png_header, 1, 64, file_ptr.Get())); read_cnt < 64)
+  {
 	throw exception::ParseError{file_.GetFileName(), "Wrong header size"};
   }
 
   lodepng_state_init(&state_);
-  unsigned error = lodepng_inspect(&width_, &height_, &state_, png_header, 64);
-  if(error)
-	throw exception::ParseError{file_.GetFileName(), "Unable to read file state"};
+  if (unsigned error = lodepng_inspect(&width_, &height_, &state_, png_header, 64); error)
+  {
+	  throw exception::ParseError{ file_.GetFileName(), "Unable to read file state" };
+  }
 
   state_.info_raw.colortype = LCT_RGB;
   state_.info_raw.bitdepth = 8;
