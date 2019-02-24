@@ -111,6 +111,10 @@ if(WIN32)
   if (BUILD_SHARED_LIBS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /DBUILD_SHARED_LIBS ")
   endif()
+  
+  if(MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+  endif()
 endif()
 ################ CXX FLAGS ##################
 
@@ -144,6 +148,17 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/lodepng)
 set(LODEPNG_SRC ${CMAKE_CURRENT_SOURCE_DIR}/lib/lodepng/lodepng.cpp ${CMAKE_CURRENT_SOURCE_DIR}/lib/lodepng/lodepng.h)
 ################ LodePNG ##################
 
+################ FFMPEG ##################
+find_path(FFMPEG_INCLUDE_DIR ffmpeg/include)
+
+find_library(AVCODEC_LIBRARY avcodec)
+find_library(AVFORMAT_LIBRARY avformat)
+find_library(AVUTIL_LIBRARY avutil)
+
+include_directories(${FFMPEG_INCLUDE_DIR})
+link_libraries(${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY})
+################ FFMPEG ##################
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src) #this makes src root dir
 
 ##############################################################################################################################
@@ -159,6 +174,9 @@ set(CARRIER_FILES_HDRS
   src/carrier_files/carrier_file_factory.h
   src/carrier_files/carrier_file_jpeg.h
   src/carrier_files/carrier_file_png.h
+  src/carrier_files/carrier_file_mkv.h
+  src/carrier_files/carrier_file_mpeg.h
+  src/carrier_files/container_handler.h
 )
 
 set(CARRIER_FILES_SRCS
@@ -167,6 +185,9 @@ set(CARRIER_FILES_SRCS
   src/carrier_files/carrier_file_factory.cc
   src/carrier_files/carrier_file_jpeg.cc
   src/carrier_files/carrier_file_png.cc
+  src/carrier_files/carrier_file_mkv.cc
+  src/carrier_files/carrier_file_mpeg.cc
+  src/carrier_files/container_handler.cc
 )
 
 # ENCODERS
