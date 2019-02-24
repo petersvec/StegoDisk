@@ -8,9 +8,6 @@
 */
 
 #include "feistel_mix_permutation.h"
-
-#include <algorithm>
-
 #include "hash/hash.h"
 #include "logging/logger.h"
 #include "utils/config.h"
@@ -19,8 +16,10 @@
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
 
-#define FMP_MIN_REQ_SIZE                        1024
-#define FMP_NUMROUNDS                           5
+#include <algorithm>
+
+constexpr auto FMPMinReqSize = 1024;
+constexpr auto FMPNumRounds = 5;
 
 namespace stego_disk {
 
@@ -41,7 +40,7 @@ void FeistelMixPermutation::Init(PermElem requested_size, Key &key) {
   if (key.GetSize() == 0)
     throw exception::EmptyArgument{"key"};
 
-  if (requested_size < FMP_MIN_REQ_SIZE)
+  if (requested_size < FMPMinReqSize)
     throw std::invalid_argument("FeistelMixPermutation: "
                              "requested_size < FMP_MIN_REQ_SIZE (=1024)");
 
@@ -63,7 +62,7 @@ void FeistelMixPermutation::Init(PermElem requested_size, Key &key) {
   auto max_hash = static_cast<uint32>(right_mask_ + 1);
 
   hash_tables_ = std::vector<std::vector<uint32> >(
-                   FMP_NUMROUNDS, std::vector<uint32>(max_hash, 0));
+	  FMPNumRounds, std::vector<uint32>(max_hash, 0));
 
   //TODO: hash could be initialized_ by key and then just append "i" in each iteration - or not?
   //      sth like: Hash hash(key.getData());
@@ -74,7 +73,7 @@ void FeistelMixPermutation::Init(PermElem requested_size, Key &key) {
   LOG_TRACE("FeistelMixPermutation::init: computing hash table (HT) containing "
             << max_hash << " elements");
 
-  for (uint32 t = 0; t < FMP_NUMROUNDS; ++t) {
+  for (uint32 t = 0; t < FMPNumRounds; ++t) {
     for (uint32 i = 0; i < max_hash; ++i) {
       hash.Process(key.GetData());
       hash.Append((uint8*)&i, sizeof(uint32));
@@ -100,7 +99,7 @@ PermElem FeistelMixPermutation::Permute(PermElem index) const {
   uint64 right = index & right_mask_;
   uint64 left = index >> right_bits_;
 
-  for (int r = 0; r < FMP_NUMROUNDS; ++r) {
+  for (int r = 0; r < FMPNumRounds; ++r) {
     if (r % 2) {
       right = (right ^ (hash_tables_[r][left] & right_mask_));
     } else {
@@ -118,7 +117,7 @@ PermElem FeistelMixPermutation::Permute(PermElem index) const {
 
 PermElem FeistelMixPermutation::GetSizeUsingParams(PermElem requested_size,
                                                    Key& /*key*/) {
-  if (requested_size < FMP_MIN_REQ_SIZE) return 0;
+  if (requested_size < FMPMinReqSize) return 0;
 
   uint8 bit_len = StegoMath::Log2(requested_size);
 

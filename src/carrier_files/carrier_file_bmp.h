@@ -10,12 +10,10 @@
 #pragma once
 
 #include <stdint.h>
-
 #include <iostream>
 #include <string>
 
 #include "carrier_file.h"
-#include "logging/logger.h"
 
 namespace stego_disk {
 

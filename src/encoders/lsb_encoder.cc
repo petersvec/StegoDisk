@@ -8,14 +8,13 @@
 */
 
 #include "lsb_encoder.h"
-
-#include <algorithm>
-#include <string.h>
-
 #include "api_mask.h"
 #include "logging/logger.h"
 #include "utils/exceptions.h"
 #include "utils/stego_math.h"
+
+#include <algorithm>
+#include <string.h>
 
 namespace stego_disk {
 

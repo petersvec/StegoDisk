@@ -11,7 +11,6 @@
 
 #include <string>
 
-#include "api_mask.h"
 #include "stego_header.h"
 #include "memory_buffer.h"
 

@@ -9,14 +9,16 @@
 
 #pragma once
 
-#include "permutation.h"
-
 #include <memory>
 #include <vector>
 
 #include "stego-disk_export.h"
 
 namespace stego_disk {
+	/**
+	 * Forward declarations
+	 */
+	class Permutation;
 
 class STEGO_DISK_EXPORT PermutationFactory final {
 private:

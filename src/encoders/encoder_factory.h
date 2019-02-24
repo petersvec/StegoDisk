@@ -9,14 +9,17 @@
 
 #pragma once
 
-#include "encoder.h"
-
 #include <memory>
 #include <vector>
 
 #include "stego-disk_export.h"
 
 namespace stego_disk {
+
+	/**
+	 * Forward declarations
+	 */
+	class Encoder;
 
 class STEGO_DISK_EXPORT EncoderFactory final
 {

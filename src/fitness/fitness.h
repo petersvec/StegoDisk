@@ -12,8 +12,6 @@
 #include <memory>
 #include <stdexcept>
 
-#include "api_mask.h"
-#include "logging/logger.h"
 #include "utils/memory_buffer.h"
 #include "utils/stego_types.h"
 

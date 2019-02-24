@@ -8,7 +8,6 @@
 */
 
 #include "affine64_permutation.h"
-
 #include "utils/stego_math.h"
 #include "utils/stego_errors.h"
 #include "utils/config.h"

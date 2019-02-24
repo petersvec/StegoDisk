@@ -14,8 +14,6 @@
 #include <string>
 
 #include "carrier_file.h"
-#include "logging/logger.h"
-
 #include "lodepng.h"
 
 namespace stego_disk {

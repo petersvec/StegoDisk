@@ -8,14 +8,13 @@
 */
 
 #include "stego_storage.h"
-
-#include <fstream>
-
 #include "api_mask.h"
 #include "file_management/carrier_files_manager.h"
 #include "utils/exceptions.h"
 #include "utils/stego_config.h"
 #include "virtual_storage/virtual_storage.h"
+
+#include <fstream>
 
 namespace stego_disk {
 
@@ -44,21 +43,26 @@ void StegoStorage::Open(const std::string &storage_base_path,
 }
 
 void StegoStorage::Configure(const std::string &config_path) const {
-  std::ifstream ifs(config_path.c_str());
-  if (!ifs.is_open()) {
-    throw exception::ErrorOpenFIle{config_path};
-  }
 
-  std::string json_string((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
-  ifs.close();
+	if (std::ifstream ifs(config_path.c_str()); ifs.is_open())
+	{
+		std::string json_string((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
+		ifs.close();
 
-  json::JsonObject config;
-  std::string parse_error = json::Parse(json_string, &config);
-
-  if (!parse_error.empty()) {
-    throw exception::ParseError{config_path, parse_error};
-  }
-  StegoConfig::Init(config);
+		json::JsonObject config;
+		if (auto parse_error = json::Parse(json_string, &config); parse_error.empty())
+		{
+			StegoConfig::Init(config);
+		}
+		else
+		{
+			throw exception::ParseError{ config_path, parse_error };
+		}
+	}
+	else
+	{
+		throw exception::ErrorOpenFIle{ config_path };
+	}
 }
 
 void StegoStorage::Configure() const {
@@ -160,16 +164,14 @@ std::size_t StegoStorage::GetSize() const {
 void StegoStorage::ChangeEncoder(std::string &config) const {
 
   json::JsonObject json_config;
-  std::string parse_error = json::Parse(config, &json_config);
+  if (auto parse_error = json::Parse(config, &json_config); parse_error.empty())
+  {
 
-  if (!parse_error.empty()) {
-    throw exception::ParseError{config, parse_error};
   }
-
-  try {
-//    return carrier_files_manager_->GetCapacityUsingEncoder(encoder);
+  else
+  {
+	  throw exception::ParseError{ config, parse_error };
   }
-  catch (...) { throw; }
 }
 
 } // stego_disk

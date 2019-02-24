@@ -8,14 +8,13 @@
 */
 
 #include "hamming_encoder.h"
-
-#include <string.h>
-#include <algorithm>
-
 #include "logging/logger.h"
 #include "utils/exceptions.h"
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
+
+#include <string.h>
+#include <algorithm>
 
 namespace stego_disk {
 

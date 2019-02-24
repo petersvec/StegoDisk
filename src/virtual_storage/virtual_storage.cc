@@ -8,11 +8,6 @@
 */
 
 #include "virtual_storage.h"
-
-#include <time.h>
-
-#include <exception>
-
 #include "hash/hash.h"
 #include "logging/logger.h"
 #include "permutations/permutation.h"
@@ -21,6 +16,10 @@
 #include "utils/keccak/keccak.h"
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
+#include "permutations/permutation_factory.h"
+
+#include <time.h>
+#include <exception>
 
 namespace stego_disk {
 

@@ -11,18 +11,7 @@
 
 #include <iostream>
 
-#include "api_mask.h"
 #include "stego-disk_export.h"
-
-//typedef enum LoggerVerbosityLevel {
-//  kLoggerVerbosityDisabled = 0,
-//  kLoggerVerbosityFatal = 1,
-//  kLoggerVerbosityError = 2,
-//  kLoggerVerbosityWarning = 3,
-//  kLoggerVerbosityInfo = 4,
-//  kLoggerVerbosityDebug = 5,
-//  kLoggerVerbosityTrace = 6
-//} LoggerVerbosityLevel;
 
 enum class LoggerVerbosityLevel : unsigned 
 {

@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <string>
 
-#include "api_mask.h"
 #include "stego-disk_export.h"
 
 #define DEFINE_GETTER(member_name) \
@@ -130,6 +129,7 @@ public:
 
 	virtual const char * what() const noexcept override { return "Size of new created "
 		                                                "buffer is zero"; }
+	virtual const char * what() const noexcept override { return "Size of new created buffer is zero"; }
 
 	virtual ~ZeroAllocatedSize() {}
 };
@@ -230,6 +230,7 @@ public:
 
 	virtual const char * what() const noexcept override { return "This function is not "
 		                                                "implemented yet"; }
+	virtual const char * what() const noexcept override { return "This function is not implemented yet"; }
 
 	virtual ~FuctionNotImplementad() {}
 };

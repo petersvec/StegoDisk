@@ -13,16 +13,17 @@
 #include <string>
 #include <stdexcept>
 
-#include "api_mask.h"
 #include "encoders/encoder_factory.h"
 #include "stego-disk_export.h"
 #include "permutations/permutation_factory.h"
 #include "utils/json.h"
 
 namespace stego_disk {
-
-class CarrierFilesManager;
-class VirtualStorage;
+	/**
+	 * Forward declarations
+	 */
+	class CarrierFilesManager;
+	class VirtualStorage;
 
 class STEGO_DISK_EXPORT StegoStorage {
 

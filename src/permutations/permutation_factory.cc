@@ -8,16 +8,14 @@
 */
 
 #include "permutation_factory.h"
-
-#include <algorithm>
-
-
 #include "affine64_permutation.h"
 #include "affine_permutation.h"
 #include "feistel_mix_permutation.h"
 #include "feistel_num_permutation.h"
 #include "identity_permutation.h"
 #include "utils/exceptions.h"
+
+#include <algorithm>
 
 namespace stego_disk {
 

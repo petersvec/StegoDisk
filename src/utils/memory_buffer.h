@@ -11,7 +11,6 @@
 
 #include <string>
 
-#include "api_mask.h"
 #include "stego_types.h"
 
 namespace stego_disk {

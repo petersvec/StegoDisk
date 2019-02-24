@@ -8,9 +8,6 @@
 */
 
 #include "carrier_file_factory.h"
-
-#include <algorithm>
-
 #include "carrier_file.h"
 #include "carrier_file_bmp.h"
 #include "carrier_file_jpeg.h"
@@ -65,5 +62,4 @@ namespace stego_disk
 		auto config = StegoConfig::file_config();
 		return PermutationFactory::GetPermutation((config.find(ext) != config.end() ? config[ext].second : StegoConfig::local_perm()));
 	}
-
 } // stego_disk
