@@ -1,4 +1,7 @@
 #include "carrier_file_mpeg.h"
+#include "logging/logger.h"
+#include "permutations/permutation.h"
+#include "fitness/fitness.h"
 
 namespace stego_disk
 {
@@ -154,7 +157,7 @@ namespace stego_disk
 			{
 				LOG_TRACE("Packet not applicable, dropping, pts: " + std::to_string(packet.get().pts) +
 					"dts: " + std::to_string(packet.get().dts) +
-					"stream index: " + std::to_string(packet.get().stream_index))
+					"stream index: " + std::to_string(packet.get().stream_index));
 			}
 		}
 	}
@@ -180,7 +183,7 @@ namespace stego_disk
 
 				LOG_TRACE("Packet after, pts: " + std::to_string(packet.get().pts) +
 					"dts: " + std::to_string(packet.get().dts) +
-					"stream index: " + std::to_string(packet.get().stream_index))
+					"stream index: " + std::to_string(packet.get().stream_index));
 
 				if (buffer_offset == buffer.GetSize())
 				{
@@ -191,7 +194,7 @@ namespace stego_disk
 			{
 				LOG_TRACE("Packet not applicable, dropping, pts: " + std::to_string(packet.get().pts) +
 					"dts: " + std::to_string(packet.get().dts) +
-					"stream index: " + std::to_string(packet.get().stream_index))
+					"stream index: " + std::to_string(packet.get().stream_index));
 			}
 		}
 

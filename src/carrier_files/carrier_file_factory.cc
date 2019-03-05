@@ -18,6 +18,7 @@
 #include "permutations/permutation_factory.h"
 #include "utils/stego_config.h"
 #include "permutations/permutation.h"
+#include "fitness/context_fitness.h"
 
 namespace stego_disk 
 {

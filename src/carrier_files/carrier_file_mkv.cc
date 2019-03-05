@@ -2,6 +2,8 @@
 #include "utils/memory_buffer.h"
 #include "utils/exceptions.h"
 #include "logging/logger.h"
+#include "permutations/permutation.h"
+#include "fitness/fitness.h"
 
 namespace stego_disk
 {
