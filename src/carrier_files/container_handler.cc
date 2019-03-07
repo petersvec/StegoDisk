@@ -64,6 +64,8 @@ namespace stego_disk
 			data_.emplace_back(std::move(packet));
 			stream_data_[stream_type].emplace_back(std::ref(*data_.back()));
 		}
+
+		LOG_DEBUG("B frames detected: " + std::to_string(this->has_b_frames));
 	}
 
 	void ContainerHandler::Save()

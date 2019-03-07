@@ -95,21 +95,29 @@ namespace stego_disk
 
 			if (stream_data.find(StreamType::Video) != stream_data.end())
 			{
-				auto video_stream = stream_data.at(StreamType::Video);
-
-				for (const auto &packet : video_stream)
+				if (container_handler_->HasBFrames())
 				{
-					auto[zero_pts, one_pts, dts] = this->GetTestValues(packet.get());
+					auto video_stream = stream_data.at(StreamType::Video);
 
-					if (zero_pts >= dts && one_pts >= dts)
+					for (const auto &packet : video_stream)
 					{
-						size += 1;
+						auto[zero_pts, one_pts, dts] = this->GetTestValues(packet.get());
+
+						if (zero_pts >= dts && one_pts >= dts)
+						{
+							size += 1;
+						}
 					}
 				}
+				else
+				{
+					size += static_cast<uint64>(stream_data.at(StreamType::Video).size());
+				}
 			}
-			else
+			
+			if (stream_data.find(StreamType::Audio) != stream_data.end())
 			{
-				return 0;
+				size += static_cast<uint64>(stream_data.at(StreamType::Audio).size());
 			}
 
 			LOG_DEBUG("Raw capacity: " + std::to_string(size / 8) + "B");
@@ -130,34 +138,50 @@ namespace stego_disk
 
 		std::size_t buffer_offset{ 0u };
 		uint8 current_byte{ 0u };
+		auto &stream_data = container_handler_->GetStreamData();
 
-		for (const auto &packet : container_handler_->GetStreamData().at(StreamType::Video))
+		// loading from video stream
+		if (stream_data.find(StreamType::Video) != stream_data.end())
 		{
-			auto[zero_pts, one_pts, dts] = this->GetTestValues(packet.get());
-
-			if (zero_pts >= dts && one_pts >= dts)
+			for (const auto &packet : stream_data.at(StreamType::Video))
 			{
-				LOG_TRACE("Reading from packet, pts: " + std::to_string(packet.get().pts) +
-					" dts: " + std::to_string(packet.get().dts) +
-					" stream index: " + std::to_string(packet.get().stream_index));
+				if (container_handler_->HasBFrames())
+				{
+					auto[zero_pts, one_pts, dts] = this->GetTestValues(packet.get());
 
-				current_byte = packet.get().pts & 0xFF;
-				buffer.Write(buffer_offset, &current_byte, sizeof(uint8));
-				buffer_offset += 1;
+					if (zero_pts >= dts && one_pts >= dts)
+					{
+						if (!ReadByte(packet.get(), buffer, buffer_offset))
+						{
+							break;
+						}
+					}
+					else
+					{
+						LOG_TRACE("Packet not applicable, dropping, pts: " + std::to_string(packet.get().pts) +
+							"dts: " + std::to_string(packet.get().dts) +
+							"stream index: " + std::to_string(packet.get().stream_index));
+					}
+				}
+				else
+				{
+					if (!ReadByte(packet.get(), buffer, buffer_offset))
+					{
+						break;
+					}
+				}
+			}
+		}
 
-				LOG_TRACE("Byte read: " + std::to_string(current_byte) +
-					" offset: " + std::to_string(buffer_offset));
-
-				if (buffer_offset == buffer.GetSize())
+		// loading from audio stream
+		if (stream_data.find(StreamType::Audio) != stream_data.end())
+		{
+			for (const auto &packet : stream_data.at(StreamType::Audio))
+			{
+				if (!ReadByte(packet.get(), buffer, buffer_offset))
 				{
 					break;
 				}
-			}
-			else
-			{
-				LOG_TRACE("Packet not applicable, dropping, pts: " + std::to_string(packet.get().pts) +
-					"dts: " + std::to_string(packet.get().dts) +
-					"stream index: " + std::to_string(packet.get().stream_index));
 			}
 		}
 	}
@@ -167,38 +191,106 @@ namespace stego_disk
 		LOG_DEBUG("Saving MPEG buffer");
 
 		std::size_t buffer_offset{ 0u };
-
-		for (auto &packet : container_handler_->GetStreamData().at(StreamType::Video))
+		auto &stream_data = container_handler_->GetStreamData();
+		
+		// saving into video stream
+		if (stream_data.find(StreamType::Video) != stream_data.end())
 		{
-			auto[zero_pts, one_pts, dts] = this->GetTestValues(packet.get());
-
-			if (zero_pts >= dts && one_pts >= dts)
+			for (auto &packet : stream_data.at(StreamType::Video))
 			{
-				LOG_TRACE("Packet before, pts: " + std::to_string(packet.get().pts) +
-					"dts: " + std::to_string(packet.get().dts) +
-					"stream index: " + std::to_string(packet.get().stream_index));
+				if (container_handler_->HasBFrames())
+				{
+					auto[zero_pts, one_pts, dts] = this->GetTestValues(packet.get());
 
-				packet.get().pts = (packet.get().pts & (~1)) | ((buffer[buffer_offset] & 1));
-				buffer_offset += 1;
+					if (zero_pts >= dts && one_pts >= dts)
+					{
+						if (!WriteByte(packet, buffer, buffer_offset, false))
+						{
+							break;
+						}
+					}
+					else
+					{
+						LOG_TRACE("Packet not applicable, dropping, pts: " + std::to_string(packet.get().pts) +
+							"dts: " + std::to_string(packet.get().dts) +
+							"stream index: " + std::to_string(packet.get().stream_index));
+					}
+				}
+				else
+				{
+					if (!WriteByte(packet, buffer, buffer_offset, true))
+					{
+						break;
+					}
+				}
+			}
+		}
 
-				LOG_TRACE("Packet after, pts: " + std::to_string(packet.get().pts) +
-					"dts: " + std::to_string(packet.get().dts) +
-					"stream index: " + std::to_string(packet.get().stream_index));
-
-				if (buffer_offset == buffer.GetSize())
+		// saving into audio stream
+		if (stream_data.find(StreamType::Audio) != stream_data.end())
+		{
+			for (auto &packet : stream_data.at(StreamType::Audio))
+			{
+				if (!WriteByte(packet, buffer, buffer_offset, true))
 				{
 					break;
 				}
 			}
-			else
-			{
-				LOG_TRACE("Packet not applicable, dropping, pts: " + std::to_string(packet.get().pts) +
-					"dts: " + std::to_string(packet.get().dts) +
-					"stream index: " + std::to_string(packet.get().stream_index));
-			}
 		}
 
 		container_handler_->Save();
+	}
+
+	bool CarrierFileMPEG::ReadByte(const AVPacket &packet, MemoryBuffer &buffer, std::size_t &offset)
+	{
+		LOG_TRACE("Reading from packet, pts: " + std::to_string(packet.pts) +
+			" dts: " + std::to_string(packet.dts) +
+			" stream index: " + std::to_string(packet.stream_index));
+
+		uint8 current_byte = packet.pts & 0xFF;
+		buffer.Write(offset, &current_byte, sizeof(uint8));
+		offset += 1;
+
+		LOG_TRACE("Byte read: " + std::to_string(current_byte) +
+			" offset: " + std::to_string(offset));
+
+		if (offset == buffer.GetSize())
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	bool CarrierFileMPEG::WriteByte(AVPacket &packet, const MemoryBuffer &buffer, std::size_t &offset, bool update_dts)
+	{
+		LOG_TRACE("Packet before, pts: " + std::to_string(packet.pts) +
+			"dts: " + std::to_string(packet.dts) +
+			"stream index: " + std::to_string(packet.stream_index));
+
+		packet.pts = (packet.pts & (~1)) | ((buffer[offset] & 1));
+
+		if (update_dts)
+		{
+			packet.dts = packet.pts;
+		}
+
+		offset += 1;
+
+		LOG_TRACE("Packet after, pts: " + std::to_string(packet.pts) +
+			"dts: " + std::to_string(packet.dts) +
+			"stream index: " + std::to_string(packet.stream_index));
+		
+		if (offset == buffer.GetSize())
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	stego_disk::uint64 CarrierFileMPEG::ModifyLSB(uint64 value, uint64 lsb) const
