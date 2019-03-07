@@ -50,6 +50,16 @@ namespace stego_disk
 			LOG_TRACE("Packet read, pts: " + std::to_string(packet->pts) +
 				" dts: " + std::to_string(packet->dts) +
 				" stream: " + this->GetStreamStr(stream_type));
+			
+			// check if video codec uses B frames (WIP, probably needs more testing...) 
+			// if codec uses only I and P frames, both pts and dts should be the same
+			// in same cases difference could be 1, even without B frames
+			// therefore if difference between pts and dts is 2 and larger,
+			// we can guess that codec uses B frames
+			if (stream_type == StreamType::Video && std::abs(packet->pts - packet->dts) >= 2)
+			{
+				has_b_frames = true;
+			}
 
 			data_.emplace_back(std::move(packet));
 			stream_data_[stream_type].emplace_back(std::ref(*data_.back()));
@@ -113,6 +123,11 @@ namespace stego_disk
 
 		av_write_trailer(output_context_);
 		this->Close();
+	}
+
+	bool ContainerHandler::HasBFrames() const
+	{
+		return has_b_frames;
 	}
 
 	stego_disk::StreamData& ContainerHandler::GetStreamData()

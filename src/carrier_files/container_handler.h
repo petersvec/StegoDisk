@@ -45,6 +45,8 @@ namespace stego_disk
 		void Load();
 		void Save();
 
+		bool HasBFrames() const;
+
 		StreamData& GetStreamData();
 		std::vector<PacketUPtr>& GetData();
 	private:
@@ -58,5 +60,6 @@ namespace stego_disk
 		AVFormatContext *output_context_{ nullptr };
 		std::vector<PacketUPtr> data_;
 		StreamData stream_data_;
+		bool has_b_frames{ false };
 	};
 }
