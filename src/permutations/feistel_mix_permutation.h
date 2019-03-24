@@ -16,7 +16,6 @@
 namespace stego_disk {
 
 class FeistelMixPermutation : public Permutation {
-
 public:
   FeistelMixPermutation();
   ~FeistelMixPermutation();

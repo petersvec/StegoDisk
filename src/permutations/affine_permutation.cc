@@ -13,6 +13,8 @@
 #include "utils/exceptions.h"
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
+#include "keys/key.h"
+#include "utils/memory_buffer.h"
 
 namespace stego_disk {
 
@@ -55,7 +57,7 @@ PermElem AffinePermutation::GetSizeUsingParams(PermElem requested_size, Key &key
                                   "nonzero multiple of 16");
 
     for (std::size_t i = 0; i < key.GetSize() / 2; i += 8) {
-      a ^= (uint64)*(uint64*)(&key.GetData()[i]);
+		a ^= (uint64)*(uint64*)(&key.GetData()[i]);
     }
     for (std::size_t i = key.GetSize() / 2; i < key.GetSize(); i += 8) {
       b ^= (uint64)*(uint64*)(&key.GetData()[i]);

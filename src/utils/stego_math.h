@@ -12,9 +12,12 @@
 #include <string>
 
 #include "stego_header.h"
-#include "memory_buffer.h"
 
 namespace stego_disk {
+	/**
+	 * Forward declarations
+	 */
+	class MemoryBuffer;
 
 class StegoMath {
 

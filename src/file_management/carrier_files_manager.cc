@@ -21,6 +21,10 @@
 #include "utils/stego_math.h"
 #include "utils/thread_pool.h"
 #include "virtual_storage/virtual_storage.h"
+#include "keys/key.h"
+#include "hash/hash.h"
+#include "utils/thread_pool.h"
+#include "utils/memory_buffer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,11 +37,14 @@
 
 namespace stego_disk {
 
-CarrierFilesManager::CarrierFilesManager() :
-  virtual_storage_(std::shared_ptr<VirtualStorage>(nullptr)),
-  encoder_(std::shared_ptr<Encoder>(nullptr)),
-  thread_pool_(std::make_unique<ThreadPool>(0))
-  {}
+	CarrierFilesManager::CarrierFilesManager() :
+		virtual_storage_(std::shared_ptr<VirtualStorage>(nullptr)),
+		encoder_(std::shared_ptr<Encoder>(nullptr)),
+		thread_pool_(std::make_unique<ThreadPool>(0)),
+		password_hash_(std::make_unique<Hash>())
+	{
+
+	}
 
 CarrierFilesManager::~CarrierFilesManager() {
   carrier_files_.clear();
@@ -104,7 +111,7 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
                                   exception::Component::encoder,
 								  exception::ComponentState::notActive);
 
-  try { storage->ApplyPermutation(this->GetCapacity(), master_key_); }
+  try { storage->ApplyPermutation(this->GetCapacity(), *master_key_); }
   catch (...) { throw; }
 
   for (const auto &file : carrier_files_) 
@@ -255,7 +262,7 @@ void CarrierFilesManager::ApplyEncoder() {
 
 
 void CarrierFilesManager::SetPassword(const std::string &password) {
-  password_hash_.Process(password);
+  password_hash_->Process(password);
   LOG_DEBUG("CarrierFilesManager::SetPassword: Setting password: '"
             << password << "'");
 }
@@ -271,16 +278,16 @@ void CarrierFilesManager::GenerateMasterKey() {
   }
 
   LOG_DEBUG("CarrierFilesManager::generateMasterKey: PSWD HASH is "
-            << StegoMath::HexBufferToStr(password_hash_.GetState()));
+            << StegoMath::HexBufferToStr(password_hash_->GetState()));
 
-  Hash master_hey_hash(password_hash_);
+  Hash master_hey_hash(password_hash_->GetState().GetRawPointer(), password_hash_->GetState().GetSize());
 
   // add keys generated from params of individual carrier files
   for (const auto &file : carrier_files_) {
     master_hey_hash.Append(file->GetPermKey().GetData());
   }
 
-  master_key_ = Key(master_hey_hash.GetState());
+  master_key_ = std::make_unique<Key>(master_hey_hash.GetState());
 }
 
 void CarrierFilesManager::DeriveSubkeys() {
@@ -290,7 +297,7 @@ void CarrierFilesManager::DeriveSubkeys() {
   }
 
   LOG_DEBUG("CarrierFilesManager::deriveSubkeys: master key is "
-            << StegoMath::HexBufferToStr(master_key_.GetData()));
+            << StegoMath::HexBufferToStr(master_key_->GetData()));
 
   Hash hash;
 
@@ -298,7 +305,7 @@ void CarrierFilesManager::DeriveSubkeys() {
 
     // subkey = hash ( hash(master_key | file_index) | hash(file_path) )
 
-    hash.Process(master_key_.GetData());
+    hash.Process(master_key_->GetData());
     hash.Append(std::to_string(i));
     hash.Append(carrier_files_[i]->GetFile().GetNormalizedPath());
 

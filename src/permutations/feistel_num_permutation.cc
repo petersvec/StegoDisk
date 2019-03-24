@@ -15,6 +15,8 @@
 #include "utils/keccak/keccak.h"
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
+#include "utils/memory_buffer.h"
+#include "keys/key.h"
 
 #include <math.h>
 #include <algorithm>

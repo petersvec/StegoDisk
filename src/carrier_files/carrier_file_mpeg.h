@@ -2,13 +2,21 @@
 
 #include "carrier_file.h"
 #include "utils/stego_types.h"
-#include "container_handler.h"
 
 #include <tuple>
 
+extern "C"
+{
+	#include <libavformat/avformat.h>
+}
+
 namespace stego_disk
 {
+	/**
+	 * Forward declarations
+	 */
 	class MemoryBuffer;
+	class ContainerHandler;
 
 	class CarrierFileMPEG : public CarrierFile {
 	public:
@@ -25,6 +33,6 @@ namespace stego_disk
 		uint64 ModifyLSB(uint64 value, uint64 lsb) const;
 		std::tuple<uint64, uint64, uint64> GetTestValues(const AVPacket &packet) const;
 	private:
-		ContainerHandlerUPtr container_handler_{ nullptr };
+		std::unique_ptr<ContainerHandler> container_handler_{ nullptr };
 	};
 }

@@ -13,6 +13,7 @@
 #include "logging/logger.h"
 #include "fitness/fitness.h"
 #include "permutations/permutation.h"
+#include "utils/memory_buffer.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -101,11 +102,11 @@ void CarrierFileBMP::LoadFile() {
     usable_buffer = &bitmap_buffer;
   }
 
-  buffer_.Resize(usable_capacity);
-  buffer_.Clear();
+  buffer_->Resize(usable_capacity);
+  buffer_->Clear();
 
   if (permutation_->GetSize() == 0) {
-    permutation_->Init(usable_capacity * 8, subkey_);
+    permutation_->Init(usable_capacity * 8, *subkey_);
   }
 
   uint64 bits_to_modify = permutation_->GetSize();
@@ -158,11 +159,11 @@ void CarrierFileBMP::SaveFile() {
     usable_buffer = &bitmap_buffer;
   }
 
-  buffer_.Resize(usable_capacity);
-  buffer_.Clear();
+  buffer_->Resize(usable_capacity);
+  buffer_->Clear();
 
   if (permutation_->GetSize() == 0) {
-    permutation_->Init(usable_capacity * 8, subkey_);
+    permutation_->Init(usable_capacity * 8, *subkey_);
   }
 
   uint64 bits_to_modify = permutation_->GetSize();

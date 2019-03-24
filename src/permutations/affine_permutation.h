@@ -12,6 +12,10 @@
 #include "permutation.h"
 
 namespace stego_disk {
+	/**
+	 * Forward declarations
+	 */
+	class Key;
 
 class AffinePermutation : public Permutation {
 

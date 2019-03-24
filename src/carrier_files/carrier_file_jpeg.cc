@@ -13,6 +13,7 @@
 #include "utils/stego_math.h"
 #include "permutations/permutation.h"
 #include "fitness/fitness.h"
+#include "utils/memory_buffer.h"
 
 #include <errno.h>
 #include <math.h>
@@ -91,11 +92,11 @@ void CarrierFileJPEG::LoadFile() {
   auto file_ptr = file_.Open();
 
   if (permutation_->GetSize() == 0) {
-    permutation_->Init(raw_capacity_ * 8, subkey_);
+    permutation_->Init(raw_capacity_ * 8, *subkey_);
   }
 
-  buffer_.Resize(raw_capacity_);
-  buffer_.Clear();
+  buffer_->Resize(raw_capacity_);
+  buffer_->Clear();
 
   struct jpeg_decompress_struct cinfo_decompress;
   struct jpeg_error_mgr jerr_decompress;
@@ -157,7 +158,7 @@ void CarrierFileJPEG::LoadFile() {
   LOG_TRACE(file_.GetRelativePath() << ", coeff_counter:" << coeff_counter);
 
   LOG_TRACE(file_.GetRelativePath() << ", unpacked buffer: " <<
-            StegoMath::HexBufferToStr(buffer_.GetRawPointer(), 10));
+            StegoMath::HexBufferToStr(buffer_->GetRawPointer(), 10));
 
   if (ExtractBufferUsingEncoder()) {
     LOG_ERROR("CarrierFileJPEG::loadFile: file " << file_.GetRelativePath()
@@ -188,11 +189,11 @@ void CarrierFileJPEG::SaveFile() {
   LOG_TRACE("Saving file " << file_.GetRelativePath());
 
   if (permutation_->GetSize() == 0) {
-    permutation_->Init(raw_capacity_ * 8, subkey_);
+    permutation_->Init(raw_capacity_ * 8, *subkey_);
   }
 
-  buffer_.Resize(raw_capacity_);
-  buffer_.Clear();
+  buffer_->Resize(raw_capacity_);
+  buffer_->Clear();
 
   // JPEG LOADING PHASE -------------------------------------------
 

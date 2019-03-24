@@ -13,6 +13,7 @@
 #include "logging/logger.h"
 #include "permutations/permutation.h"
 #include "fitness/fitness.h"
+#include "utils/memory_buffer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -57,11 +58,11 @@ void CarrierFilePNG::LoadFile() {
     LOG_INFO("Loading file " << file_.GetRelativePath());
 
     if (permutation_->GetSize() == 0) {
-      permutation_->Init(raw_capacity_ * 8, subkey_);
+      permutation_->Init(raw_capacity_ * 8, *subkey_);
     }
 
-    buffer_.Resize(raw_capacity_);
-    buffer_.Clear();
+    buffer_->Resize(raw_capacity_);
+    buffer_->Clear();
 
     MemoryBuffer png_buffer(file_.GetSize());
 
@@ -114,11 +115,11 @@ void CarrierFilePNG::SaveFile() {
   LOG_INFO("Saving file " << file_.GetRelativePath());
 
   if (permutation_->GetSize() == 0) {
-    permutation_->Init(raw_capacity_ * 8, subkey_);
+    permutation_->Init(raw_capacity_ * 8, *subkey_);
   }
 
-  buffer_.Resize(raw_capacity_);
-  buffer_.Clear();
+  buffer_->Resize(raw_capacity_);
+  buffer_->Clear();
 
   MemoryBuffer png_buffer(file_.GetSize());
 

@@ -17,6 +17,7 @@
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
 #include "permutations/permutation_factory.h"
+#include "utils/memory_buffer.h"
 
 #include <time.h>
 #include <exception>
@@ -113,7 +114,7 @@ void VirtualStorage::UnSetPermutation() {
  *
  * @param[in] globalPermutation Correctly Initialized permutation
  */
-void VirtualStorage::ApplyPermutation(uint64 requested_size, Key key) {
+void VirtualStorage::ApplyPermutation(uint64 requested_size, Key &key) {
   if ( !global_permutation_ )
     throw exception::InvalidState{exception::Operation::getCapacity,
                                   exception::Component::permutation,
@@ -136,7 +137,7 @@ void VirtualStorage::ApplyPermutation(uint64 requested_size, Key key) {
     throw std::out_of_range("VirtualStorage::applyPermutation: "
                             "capacity ot the storage is too low");
 
-  data_ = MemoryBuffer(raw_capacity);
+  data_ = std::make_unique<MemoryBuffer>(raw_capacity);
 
   raw_capacity_ = raw_capacity;
   usable_capacity_ = raw_capacity - StorageHashLenght;
@@ -163,7 +164,7 @@ uint8 VirtualStorage::ReadByte(uint64 position) {
                                   exception::Component::storage,
 								  exception::ComponentState::notInitialized};
 
-  return data_[global_permutation_->Permute(position)];
+  return (*data_)[global_permutation_->Permute(position)];
 }
 
 /**
@@ -184,7 +185,7 @@ void VirtualStorage::WriteByte(uint64 position, uint8 value) {
                                   exception::Component::storage,
 								  exception::ComponentState::notInitialized};
 
-  data_[global_permutation_->Permute(position)] = value;
+  (*data_)[global_permutation_->Permute(position)] = value;
 }
 
 /**
@@ -205,12 +206,12 @@ void VirtualStorage::Read(uint64 offset,
   if (length == 0)
     return;
 
-  if (data_.GetConstRawPointer() == nullptr)
+  if (data_->GetConstRawPointer() == nullptr)
     throw exception::InvalidState{exception::Operation::ioVirtualStorage,
                                   exception::Component::storage,
 								  exception::ComponentState::notInitialized};
 
-  memcpy(buffer, (void*)(data_.GetConstRawPointer() + offset), length);
+  memcpy(buffer, (void*)(data_->GetConstRawPointer() + offset), length);
 }
 
 /**
@@ -231,12 +232,12 @@ void VirtualStorage::Write(uint64 offset,
   if (length == 0)
     return;
 
-  if (data_.GetConstRawPointer() == nullptr)
+  if (data_->GetConstRawPointer() == nullptr)
     throw exception::InvalidState{exception::Operation::ioVirtualStorage,
                                   exception::Component::storage,
 								  exception::ComponentState::notInitialized};
 
-  memcpy(data_.GetRawPointer() + offset, buffer, length);
+  memcpy(data_->GetRawPointer() + offset, buffer, length);
 }
 
 
@@ -244,14 +245,14 @@ void VirtualStorage::Write(uint64 offset,
  * @brief Fills the storage with random data_
  */
 void VirtualStorage::RandomizeBuffer() {
-  data_.Randomize();
+  data_->Randomize();
 }
 
 /**
  * @brief Fills the storage with zeros
  */
 void VirtualStorage::ClearBuffer() {
-  data_.Clear();
+  data_->Clear();
 }
 
 /**
@@ -261,7 +262,7 @@ void VirtualStorage::ClearBuffer() {
  * @return
  */
 void VirtualStorage::FillBuffer(uint8 value) {
-  data_.Fill(value);
+  data_->Fill(value);
 }
 
 
@@ -273,16 +274,16 @@ void VirtualStorage::FillBuffer(uint8 value) {
  * @return true if the checksum is valid, false otherwise
  */
 bool VirtualStorage::IsValidChecksum() {
-  if (data_.GetSize() == 0)
+  if (data_->GetSize() == 0)
     throw exception::EmptyMember{"data"};
 
   if (usable_capacity_ == 0)
     throw exception::EmptyMember{"usable_capacity"};
 
   //TODO:    #warning Sync hash length with SFS_STORAGE_HASH_LENGTH
-  Hash checksum(data_.GetConstRawPointer(), usable_capacity_);
+  Hash checksum(data_->GetConstRawPointer(), usable_capacity_);
 
-  MemoryBuffer stored_checksum(data_.GetConstRawPointer() + usable_capacity_, StorageHashLenght);
+  MemoryBuffer stored_checksum(data_->GetConstRawPointer() + usable_capacity_, StorageHashLenght);
 
   LOG_DEBUG("VirtualStorage::isValidChecksum:   Stored CHECKSUM: "
             << StegoMath::HexBufferToStr(stored_checksum));
@@ -290,7 +291,7 @@ bool VirtualStorage::IsValidChecksum() {
             << StegoMath::HexBufferToStr(checksum.GetState()));
   LOG_TRACE("VirtualStorage::isValidChecksum: data_ (raw Capacity = "
             << raw_capacity_ << "): "
-            << StegoMath::HexBufferToStr(&data_[0],
+            << StegoMath::HexBufferToStr(&(*data_)[0],
             static_cast<int>(raw_capacity_)));
 
   return (stored_checksum == checksum.GetState());
@@ -302,22 +303,22 @@ bool VirtualStorage::IsValidChecksum() {
  *
  */
 void VirtualStorage::WriteChecksum() {
-  if ((data_.GetSize() == 0) || (usable_capacity_ == 0))
+  if ((data_->GetSize() == 0) || (usable_capacity_ == 0))
     throw exception::InvalidState{exception::Operation::ioVirtualStorage,
                                   exception::Component::storage,
 								  exception::ComponentState::notInitialized};
 
   //TODO:    #warning Sync hash length with SFS_STORAGE_HASH_LENGTH
 
-  Hash checksum(data_.GetConstRawPointer(), usable_capacity_);
+  Hash checksum(data_->GetConstRawPointer(), usable_capacity_);
 
-  data_.Write(usable_capacity_, checksum.GetState().GetConstRawPointer(),
+  data_->Write(usable_capacity_, checksum.GetState().GetConstRawPointer(),
               checksum.GetStateSize());
   LOG_DEBUG("VirtualStorage::WriteChecksum: Computed CHECKSUM: "
             << StegoMath::HexBufferToStr(checksum.GetState()));
   LOG_TRACE("VirtualStorage::WriteChecksum: data_ (raw Capacity = "
             << raw_capacity_ << "): "
-            << StegoMath::HexBufferToStr(&data_[0],
+            << StegoMath::HexBufferToStr(&(*data_)[0],
             static_cast<int>(raw_capacity_)));
 }
 

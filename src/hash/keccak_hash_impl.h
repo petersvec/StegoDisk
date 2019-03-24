@@ -12,9 +12,13 @@
 #include <memory>
 
 #include "hash_impl.h"
-#include "utils/memory_buffer.h"
+#include "utils/stego_types.h"
 
 namespace stego_disk {
+	/**
+	 * Forward declarations
+	 */
+	class MemoryBuffer;
 
 class KeccakHashImpl : public HashImpl {
 

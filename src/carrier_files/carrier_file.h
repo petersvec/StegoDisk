@@ -16,7 +16,6 @@
 #include <string>
 #include <typeinfo>
 
-#include "keys/key.h"
 #include "utils/file.h"
 #include "utils/stego_types.h"
 
@@ -29,6 +28,8 @@ namespace stego_disk {
 	class Permutation;
 	class Fitness;
 	class VirtualStorage;
+	class Key;
+	class MemoryBuffer;
 
 /**
  * The CarrierFile class.
@@ -60,7 +61,7 @@ public:
   virtual void LoadFile() = 0;
   virtual void SaveFile() = 0;
 
-  void SetSubkey(const Key& subkey_);
+  void SetSubkey(Key& subkey);
   int AddToVirtualStorage(std::shared_ptr<VirtualStorage> storage, uint64 offSet,
                           uint64 bytes_used);
 
@@ -82,7 +83,7 @@ protected:
   int ExtractBufferUsingEncoder();
   int EmbedBufferUsingEncoder();
 
-  MemoryBuffer buffer_;
+  std::unique_ptr<MemoryBuffer> buffer_{ nullptr };
   uint32 width_{ 0 };
   uint32 height_{ 0 };
   bool is_grayscale_{ false };
@@ -94,7 +95,7 @@ protected:
   uint32 blocks_used_{ 0 };
   uint64 virtual_storage_offset_{ 0 };
   bool file_loaded_{ false };
-  Key subkey_;
+  std::unique_ptr<Key> subkey_{ nullptr };
   File file_;
   std::shared_ptr<Encoder> encoder_{ nullptr };
   std::shared_ptr<Permutation> permutation_{ nullptr };

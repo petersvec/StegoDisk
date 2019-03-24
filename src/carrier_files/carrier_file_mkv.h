@@ -2,11 +2,19 @@
 
 #include "carrier_file.h"
 #include "utils/stego_types.h"
-#include "container_handler.h"
+
+extern "C"
+{
+	#include <libavformat/avformat.h>
+}
 
 namespace stego_disk
 {
+	/**
+	 * Forward declarations
+	 */
 	class MemoryBuffer;
+	class ContainerHandler;
 
 	class CarrierFileMKV : public CarrierFile {
 	public:
@@ -19,6 +27,6 @@ namespace stego_disk
 		void LoadBuffer(MemoryBuffer &buffer);
 		void SaveBuffer(const MemoryBuffer &buffer);
 	private:
-		ContainerHandlerUPtr container_handler_{ nullptr };
+		std::unique_ptr<ContainerHandler> container_handler_{ nullptr };
 	};
 }

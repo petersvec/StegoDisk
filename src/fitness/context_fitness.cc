@@ -9,6 +9,7 @@
 #include "api_mask.h"
 #include "context_fitness.h"
 #include "carrier_files/carrier_file.h"
+#include "utils/memory_buffer.h"
 
 namespace stego_disk {
 

@@ -15,16 +15,19 @@
 #include <vector>
 #include <unordered_set>
 
-#include "api_mask.h"
-#include "hash/hash.h"
-#include "keys/key.h"
-#include "utils/thread_pool.h"
+#include "utils/stego_types.h"
 
 namespace stego_disk {
 
-class Encoder;
-class VirtualStorage;
-class CarrierFile;
+	/**
+	 * Forward declarations
+	 */
+	class Encoder;
+	class VirtualStorage;
+	class CarrierFile;
+	class Key;
+	class Hash;
+	class ThreadPool;
 
 static std::unordered_set<std::string> SupportedFormats {
 	"jpg", "bmp", "png", "mkv", "mp4"
@@ -65,9 +68,8 @@ private:
   uint64 capacity_{ 0 };
   uint64 files_in_directory_{ 0 };
 
-  Hash password_hash_;
-  Key master_key_;
-
+  std::unique_ptr<Hash> password_hash_{ nullptr };
+  std::unique_ptr<Key> master_key_{ nullptr };
   std::shared_ptr<VirtualStorage> virtual_storage_{ nullptr };
   std::shared_ptr<Encoder> encoder_{ nullptr };
   std::unique_ptr<ThreadPool> thread_pool_{ nullptr };

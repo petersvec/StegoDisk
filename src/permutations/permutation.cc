@@ -9,6 +9,7 @@
 
 #include "permutation.h"
 #include "utils/exceptions.h"
+#include "keys/key.h"
 
 namespace stego_disk {
 

@@ -18,6 +18,8 @@
 #include "virtual_storage/virtual_storage.h"
 #include "fitness/fitness.h"
 #include "permutations/permutation.h"
+#include "keys/key.h"
+#include "utils/memory_buffer.h"
 
 #include <stdio.h>
 #include <sys/stat.h>
@@ -41,6 +43,8 @@ CarrierFile::CarrierFile(File file,
     data_block_size_ = encoder->GetDataBlockSize();
     codeword_block_size_ = encoder->GetCodewordBlockSize();
   }
+
+  buffer_ = std::make_unique<MemoryBuffer>();
 }
 
 CarrierFile::~CarrierFile() {}
@@ -65,7 +69,7 @@ void CarrierFile::SetEncoder(std::shared_ptr<Encoder> encoder) {
     data_block_size_ = encoder->GetDataBlockSize();
     codeword_block_size_ = encoder->GetCodewordBlockSize();
     block_count_ = static_cast<uint32>((permutation_->GetSizeUsingParams(
-                                          raw_capacity_ * 8, subkey_) / 8)
+                                          raw_capacity_ * 8, *subkey_) / 8)
                                        / encoder->GetCodewordBlockSize());
     capacity_ = block_count_ * encoder->GetDataBlockSize();
   }
@@ -74,7 +78,7 @@ void CarrierFile::SetEncoder(std::shared_ptr<Encoder> encoder) {
 uint64 CarrierFile::GetCapacityUsingEncoder(std::shared_ptr<Encoder> encoder) {
   if (encoder && permutation_) return 0;
   uint64 block_count = ((permutation_->GetSizeUsingParams(
-                           raw_capacity_ * 8, subkey_) / 8)
+                           raw_capacity_ * 8, *subkey_) / 8)
                         / encoder->GetCodewordBlockSize());
   return (block_count * encoder->GetDataBlockSize());
 }
@@ -145,8 +149,9 @@ uint64 CarrierFile::GetRawCapacity() {
   return raw_capacity_;
 }
 
-void CarrierFile::SetSubkey(const Key& subkey) {
-  this->subkey_ = subkey;
+void CarrierFile::SetSubkey(Key& subkey) 
+{
+	this->subkey_ = std::make_unique<Key>(subkey.GetData());
 }
 
 void CarrierFile::SetBitInBufferPermuted(uint64 index) {
@@ -163,7 +168,7 @@ void CarrierFile::SetBitInBufferPermuted(uint64 index) {
     throw std::out_of_range("Permuted index is out of range!");
   }
 
-  buffer_[permuted_index / 8] |= ( 1 << (permuted_index % 8));
+  (*buffer_)[permuted_index / 8] |= ( 1 << (permuted_index % 8));
 }
 
 uint8 CarrierFile::GetBitInBufferPermuted(uint64 index) {
@@ -176,11 +181,11 @@ uint8 CarrierFile::GetBitInBufferPermuted(uint64 index) {
 
   uint64 permuted_index = permutation_->Permute(index);
 
-  return ((buffer_[permuted_index / 8] & (1 << (permuted_index % 8))) != 0);
+  return (((*buffer_)[permuted_index / 8] & (1 << (permuted_index % 8))) != 0);
 }
 
 int CarrierFile::ExtractBufferUsingEncoder() {
-  if (!buffer_.GetSize()) return -1;
+  if (!buffer_->GetSize()) return -1;
   if (!encoder_) return -2;
   if (!codeword_block_size_) return -3;
   if (!blocks_used_) return -4;
@@ -188,7 +193,7 @@ int CarrierFile::ExtractBufferUsingEncoder() {
   MemoryBuffer data_buffer(data_block_size_);
 
   for (uint64 b = 0; b < blocks_used_; ++b) {
-    encoder_->Extract(&buffer_[b * codeword_block_size_],
+    encoder_->Extract(&(*buffer_)[b * codeword_block_size_],
         data_buffer.GetRawPointer());
 
     for (uint64 i = 0; i < data_block_size_; ++i) {
@@ -215,7 +220,7 @@ int CarrierFile::ExtractBufferUsingEncoder() {
 
 
 int CarrierFile::EmbedBufferUsingEncoder() {
-  if (buffer_.GetSize() == 0) throw std::length_error("Buffer is empty!");
+  if (buffer_->GetSize() == 0) throw std::length_error("Buffer is empty!");
   if (!encoder_)
     throw exception::InvalidState{exception::Operation::embedBufferUsingEncoder,
 		                          exception::Component::encoder,
@@ -240,7 +245,7 @@ int CarrierFile::EmbedBufferUsingEncoder() {
         data_buffer[i] = 0; // TODO: not sure if random data would be better here
       }
     }
-    encoder_->Embed(&buffer_[b * codeword_block_size_],
+    encoder_->Embed(&(*buffer_)[b * codeword_block_size_],
         data_buffer.GetConstRawPointer());
   }
 

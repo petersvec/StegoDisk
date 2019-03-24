@@ -2,6 +2,8 @@
 #include "logging/logger.h"
 #include "permutations/permutation.h"
 #include "fitness/fitness.h"
+#include "utils/memory_buffer.h"
+#include "container_handler.h"
 
 namespace stego_disk
 {
@@ -28,12 +30,12 @@ namespace stego_disk
 			auto data_buffer = MemoryBuffer();
 			this->LoadBuffer(data_buffer);
 
-			buffer_.Resize(static_cast<std::size_t>(raw_capacity_));
-			buffer_.Clear();
+			buffer_->Resize(static_cast<std::size_t>(raw_capacity_));
+			buffer_->Clear();
 
 			if (!permutation_->GetSize())
 			{
-				permutation_->Init(raw_capacity_ * 8, subkey_);
+				permutation_->Init(raw_capacity_ * 8, *subkey_);
 			}
 
 			for (uint64 i = 0; i < permutation_->GetSize(); ++i)
@@ -57,12 +59,12 @@ namespace stego_disk
 			auto data_buffer = MemoryBuffer();
 			this->LoadBuffer(data_buffer);
 
-			buffer_.Resize(static_cast<std::size_t>(raw_capacity_));
-			buffer_.Clear();
+			buffer_->Resize(static_cast<std::size_t>(raw_capacity_));
+			buffer_->Clear();
 
 			if (!permutation_->GetSize())
 			{
-				permutation_->Init(raw_capacity_ * 8, subkey_);
+				permutation_->Init(raw_capacity_ * 8, *subkey_);
 			}
 
 			for (uint64 i = 0; i < permutation_->GetSize(); ++i)

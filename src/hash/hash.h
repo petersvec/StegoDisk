@@ -10,14 +10,16 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
-#include "utils/memory_buffer.h"
+#include "utils/stego_types.h"
 
 namespace stego_disk {
 	/**
 	 * Forward declarations
 	 */
 	class HashImpl;
+	class MemoryBuffer;
 
 class Hash final {
 public:
@@ -37,7 +39,7 @@ public:
 
 private:
   void Init();
-  MemoryBuffer state_;
+  std::unique_ptr<MemoryBuffer> state_{ nullptr };
 
   //TODO: implementation could be stored as shared ptr in each hash instance
   //  std::shared_ptr<HashImpl> hashImpl;

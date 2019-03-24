@@ -12,9 +12,11 @@
 #include <string>
 #include <memory>
 
-#include "utils/memory_buffer.h"
-
 namespace stego_disk {
+	/**
+	 * Forward declarations
+	 */
+	class MemoryBuffer;
 
 class Key {
 
@@ -24,7 +26,11 @@ public:
   ~Key();
 
   std::size_t GetSize();
-  const MemoryBuffer& GetData() { return data_; }
+
+  const MemoryBuffer& GetData()
+  {
+	  return *data_;
+  }
 
   static Key FromString(std::string input);
 
@@ -32,8 +38,7 @@ public:
   Key operator^(const Key& other);
 
 private:
-  MemoryBuffer data_;
-
+	std::unique_ptr<MemoryBuffer> data_{ nullptr };
 };
 } // stego_disk
 

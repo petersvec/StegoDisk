@@ -9,6 +9,7 @@
 
 #include "stego_math.h"
 #include "api_mask.h"
+#include "memory_buffer.h"
 
 #include <stdlib.h>
 #include <stdio.h>

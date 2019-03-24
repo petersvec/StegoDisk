@@ -12,9 +12,14 @@
 #include <memory>
 #include <stdexcept>
 
-#include "utils/memory_buffer.h"
+#include "utils/stego_types.h"
 
-namespace stego_disk {
+namespace stego_disk
+{
+	/**
+	 * Forward declarations
+	 */
+	class MemoryBuffer;
 
 class HashImpl {
 

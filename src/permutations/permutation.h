@@ -14,9 +14,12 @@
 #include <stdexcept>
 
 #include "utils/stego_types.h"
-#include "keys/key.h"
 
 namespace stego_disk {
+	/**
+	 * Forward declarations
+	 */
+	class Key;
 
 using PermElem = uint64;
 

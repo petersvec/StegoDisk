@@ -10,15 +10,17 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 #include "utils/stego_types.h"
-#include "keys/key.h"
 
 namespace stego_disk {
 	/**
 	 * Forward declarations
 	 */
 	class Permutation;
+	class Key;
+	class MemoryBuffer;
 
 /**
  * Main storage buffer that utilizes global permutation in readByte/writeByte ops
@@ -40,7 +42,7 @@ public:
   // Initialization of the VirtualStorage depends on permutation
   void SetPermutation(std::shared_ptr<Permutation> permutation);
   void UnSetPermutation();
-  void ApplyPermutation(uint64 requested_size, Key key);
+  void ApplyPermutation(uint64 requested_size, Key &key);
 
   //PSTODO ak tomu spravne chapem, *Byte robi na spermutovanimi, read/write nad nespermutovanimi? ak ano, su to trochu neintuitivne nazvy...
   // Accessed by CarrierFile during save/load operation
@@ -66,7 +68,7 @@ private:
 	bool   is_set_global_permutation_{ false };
 	uint64 raw_capacity_{ 0 };               // raw capacity (hash + storage)
 	uint64 usable_capacity_{ 0 };          // usable capacity (storage only)
-	MemoryBuffer data_;
+	std::unique_ptr<MemoryBuffer> data_{ nullptr };
 };
 
 } // stego_disk

@@ -11,6 +11,7 @@
 #include "api_mask.h"
 #include "utils/exceptions.h"
 #include "utils/keccak/keccak.h"
+#include "utils/memory_buffer.h"
 
 #include <stdexcept>
 

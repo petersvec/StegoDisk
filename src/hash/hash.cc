@@ -13,6 +13,7 @@
 #include "utils/exceptions.h"
 #include "utils/stego_types.h"
 #include "hash_impl.h"
+#include "utils/memory_buffer.h"
 
 #include <stdexcept>
 
@@ -25,8 +26,9 @@ void Hash::Init() {
   if (default_hash_impl_ == nullptr)
     throw exception::MissingDefault{"hash implementation"};
 
-  state_.Resize(default_hash_impl_->GetStateSize());
-  state_.Clear();
+  state_ = std::make_unique<MemoryBuffer>();
+  state_->Resize(default_hash_impl_->GetStateSize());
+  state_->Clear();
 }
 
 Hash::Hash() {
@@ -48,7 +50,7 @@ void Hash::Process(const std::string& data) {
   if (default_hash_impl_ == nullptr)
     throw exception::MissingDefault{"hash implementation"};
 
-  default_hash_impl_->Process(state_,
+  default_hash_impl_->Process(*state_,
                               (uint8*)data.c_str(),
                               data.length());
 }
@@ -60,7 +62,7 @@ void Hash::Process(const MemoryBuffer& data) {
   if (data.GetSize() == 0)
     throw exception::NullptrArgument{"data"};
 
-  default_hash_impl_->Process(state_,
+  default_hash_impl_->Process(*state_,
                               data.GetConstRawPointer(),
                               data.GetSize());
 }
@@ -69,14 +71,14 @@ void Hash::Process(const uint8* data, std::size_t length) {
   if (default_hash_impl_ == nullptr)
     throw exception::MissingDefault{"hash implementation"};
 
-  default_hash_impl_->Process(state_, data, length);
+  default_hash_impl_->Process(*state_, data, length);
 }
 
 void Hash::Append(const std::string& data) {
   if (default_hash_impl_ == nullptr)
     throw exception::MissingDefault{"hash implementation"};
 
-  default_hash_impl_->Append(state_,
+  default_hash_impl_->Append(*state_,
                              (uint8*)data.c_str(),
                              data.length());
 }
@@ -85,22 +87,22 @@ void Hash::Append(const uint8* data, std::size_t length) {
   if (default_hash_impl_ == nullptr)
     throw exception::MissingDefault{"hash implementation"};
 
-  default_hash_impl_->Append(state_, data, length);
+  default_hash_impl_->Append(*state_, data, length);
 }
 
 void Hash::Append(const MemoryBuffer& data) {
   if (default_hash_impl_ == nullptr)
     throw exception::MissingDefault{"hash implementation"};
 
-  default_hash_impl_->Append(state_, data.GetConstRawPointer(), data.GetSize());
+  default_hash_impl_->Append(*state_, data.GetConstRawPointer(), data.GetSize());
 }
 
 const MemoryBuffer& Hash::GetState() const {
-  return state_;
+  return *state_;
 }
 
 std::size_t Hash::GetStateSize() const {
-  return state_.GetSize();
+  return state_->GetSize();
 }
 
 } // stego_disk

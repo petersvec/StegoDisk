@@ -13,8 +13,8 @@
 #include <iostream>
 #include <string>
 
-#include "carrier_file.h"
 #include "lodepng.h"
+#include "carrier_file.h"
 
 namespace stego_disk {
 
