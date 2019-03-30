@@ -17,6 +17,7 @@
 #include "stego-disk_export.h"
 #include "permutations/permutation_factory.h"
 #include "utils/json.h"
+#include "utils/non_copyable.h"
 
 namespace stego_disk {
 	/**
@@ -25,7 +26,7 @@ namespace stego_disk {
 	class CarrierFilesManager;
 	class VirtualStorage;
 
-class STEGO_DISK_EXPORT StegoStorage {
+class STEGO_DISK_EXPORT StegoStorage : public NonCopyable {
 
 public:
   StegoStorage();

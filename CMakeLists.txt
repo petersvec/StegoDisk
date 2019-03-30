@@ -313,6 +313,7 @@ set(UTILS_HDRS
   src/utils/stego_math.h
   src/utils/stego_types.h
   src/utils/thread_pool.h
+  src/utils/non_copyable.h
 )
 
 set(UTILS_SRCS

@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "stego-disk_export.h"
+#include "utils/non_copyable.h"
 
 namespace stego_disk {
 
@@ -21,7 +22,7 @@ namespace stego_disk {
 	 */
 	class Encoder;
 
-class STEGO_DISK_EXPORT EncoderFactory final
+class STEGO_DISK_EXPORT EncoderFactory final : public NonCopyable
 {
 private: 
   EncoderFactory();

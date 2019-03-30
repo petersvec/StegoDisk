@@ -13,6 +13,7 @@
 #include <string>
 
 #include "utils/stego_types.h"
+#include "utils/non_copyable.h"
 
 namespace stego_disk {
 	/**
@@ -28,7 +29,7 @@ namespace stego_disk {
  * [ STORAGE (len: usable capacity) | CHECKSUM/HASH (len: hash length) ]
 */
 
-class VirtualStorage {
+class VirtualStorage : public NonCopyable {
 private:
   void Init();
 

@@ -20,11 +20,11 @@
 
 #include "api_mask.h"
 #include "utils/exceptions.h"
-
+#include "utils/non_copyable.h"
 
 namespace stego_disk {
 
-class ThreadPool {
+class ThreadPool : public NonCopyable {
 public:
   ThreadPool(size_t);
   template<class F, class... Args>

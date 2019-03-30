@@ -5,6 +5,8 @@
 #include <vector>
 #include <memory>
 
+#include "utils/non_copyable.h"
+
 extern "C"
 {
 	#include <libavformat/avformat.h>
@@ -26,14 +28,11 @@ namespace stego_disk
 	using StreamData = std::map<StreamType, std::vector<std::reference_wrapper<AVPacket>>>;
 	using ContainerHandlerUPtr = std::unique_ptr<ContainerHandler>;
 
-	class ContainerHandler {
+	class ContainerHandler : public NonCopyable {
 	public:
 		ContainerHandler(const std::string &name);
 		ContainerHandler();
 		~ContainerHandler();
-
-		ContainerHandler(const ContainerHandler &) = delete;
-		ContainerHandler& operator=(const ContainerHandler&) = delete;
 
 		ContainerHandler(const ContainerHandler &&) = delete;
 		ContainerHandler& operator=(const ContainerHandler &&) = delete;

@@ -14,10 +14,11 @@
 #include <stdexcept>
 
 #include "utils/stego_types.h"
+#include "utils/non_copyable.h"
 
 namespace stego_disk {
 
-class Encoder {
+class Encoder : public NonCopyable {
 
 public:
   Encoder();

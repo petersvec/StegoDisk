@@ -233,7 +233,8 @@ int main(int argc, char *argv[]) {
 
   if ( invert == false ) {
     LOG_DEBUG("Generating random string");
-	GenerateRandomString(&input, gen_file_size);
+	//GenerateRandomString(&input, gen_file_size);
+	input = std::string(gen_file_size, 'A');
   } else {
     LOG_DEBUG("Creating inverted DCT string");
     input.resize(gen_file_size);

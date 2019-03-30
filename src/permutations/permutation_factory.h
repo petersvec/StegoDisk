@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "stego-disk_export.h"
+#include "utils/non_copyable.h"
 
 namespace stego_disk {
 	/**
@@ -20,7 +21,7 @@ namespace stego_disk {
 	 */
 	class Permutation;
 
-class STEGO_DISK_EXPORT PermutationFactory final {
+class STEGO_DISK_EXPORT PermutationFactory final : public NonCopyable {
 private:
   PermutationFactory();
 public:

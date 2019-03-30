@@ -14,6 +14,7 @@
 #include <stdexcept>
 
 #include "utils/stego_types.h"
+#include "utils/non_copyable.h"
 
 namespace stego_disk {
 	/**
@@ -23,7 +24,7 @@ namespace stego_disk {
 
 using PermElem = uint64;
 
-class Permutation {
+class Permutation : public NonCopyable {
 
 public:
   Permutation();

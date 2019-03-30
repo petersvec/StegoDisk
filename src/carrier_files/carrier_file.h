@@ -18,6 +18,7 @@
 
 #include "utils/file.h"
 #include "utils/stego_types.h"
+#include "utils/non_copyable.h"
 
 namespace stego_disk {
 
@@ -37,7 +38,7 @@ namespace stego_disk {
  * Abstract base class CarrierFile (cannot be instantiated)
  * Provides an interface for CarrierFiles subclasses
  */
-class CarrierFile {
+class CarrierFile : public NonCopyable {
 
 public:
   CarrierFile(File file,
