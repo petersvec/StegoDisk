@@ -19,7 +19,7 @@ class HammingEncoder : public Encoder {
 
 public:
   HammingEncoder();
-  HammingEncoder(uint32 parity_bits);
+  explicit HammingEncoder(uint32 parity_bits);
 
   virtual int Embed(uint8 *codeword, const uint8 *data) override;
   virtual int Extract(const uint8 *codeword, uint8 *data) override;

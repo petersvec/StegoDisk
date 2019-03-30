@@ -20,7 +20,7 @@ namespace stego_disk {
 class ContextFitness : public Fitness {
 
 public:
-  ContextFitness(std::shared_ptr<CarrierFile> file);
+  explicit ContextFitness(std::shared_ptr<CarrierFile> file);
   ~ContextFitness();
 
   virtual uint64 SelectBytes(const MemoryBuffer &in, MemoryBuffer *out) override;

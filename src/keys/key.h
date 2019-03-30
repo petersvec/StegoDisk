@@ -22,7 +22,7 @@ class Key {
 
 public:
   Key();
-  Key(const MemoryBuffer& data_buffer);
+  explicit Key(const MemoryBuffer& data_buffer);
   ~Key();
 
   std::size_t GetSize();

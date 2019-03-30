@@ -41,7 +41,7 @@ public:
 #ifndef HAS_FILESYSTEM_LIBRARY
   File(std::string base_path, std::string relative_path);
 #else
-  File(const fs::path &path);
+  explicit File(const fs::path &path);
 #endif
   std::string GetAbsolutePath() const;
   std::string GetRelativePath() const;

@@ -19,7 +19,7 @@ class LsbEncoder : public Encoder {
 
 public:
     LsbEncoder();
-    LsbEncoder(uint32 block_size);
+    explicit LsbEncoder(uint32 block_size);
 
 	virtual int Embed(uint8 *codeword, const uint8 *data) override;
 	virtual int Extract(const uint8 *codeword, uint8 *data) override;

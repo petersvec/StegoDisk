@@ -30,7 +30,7 @@ namespace stego_disk
 
 	class ContainerHandler : public NonCopyable {
 	public:
-		ContainerHandler(const std::string &name);
+		explicit ContainerHandler(const std::string &name);
 		ContainerHandler();
 		~ContainerHandler();
 

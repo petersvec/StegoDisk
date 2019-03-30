@@ -24,7 +24,7 @@ namespace stego_disk {
 class Hash final {
 public:
   Hash();
-  Hash(const std::string& data);
+  explicit Hash(const std::string& data);
   Hash(const uint8* data, std::size_t length);
 
   void Process(const std::string& data);
