@@ -4,6 +4,7 @@ include(GenerateExportHeader)
 
 option(VERSION_NAMES "Append version into binary/library name" OFF)
 option(WITH_FUSE "Build this library with FUSE" OFF)
+option(WITH_DOKAN "Build this library with DOKAN" OFF)
 option(BUILD_SHARED "Build this as shared library" OFF)
 option(BUILD_TESTS "Whether to build automatic test suite" ON)
 option(OBFUSCATE_SYMBOLS "Whether to change names in syblols to inocent strings" OFF)
@@ -159,6 +160,16 @@ include_directories(${FFMPEG_INCLUDE_DIR})
 link_libraries(${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY})
 ################ FFMPEG ##################
 
+################ DOKAN ##################
+if(WITH_DOKAN AND WIN32)
+	find_path(DOKAN_INCLUDE_DIR dokan/include)
+	find_library(DOKAN_LIBRARY dokan)
+	
+	include_directories(${DOKAN_INCLUDE_DIR})
+	link_libraries(${DOKAN_LIBRARY})
+endif()
+################ DOKAN ##################
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src) #this makes src root dir
 
 ##############################################################################################################################
@@ -239,6 +250,12 @@ if(FUSE_FOUND)
     src/fuse/fuse_service.cc
 #    src/fuse/fuse_service_delegate.cc
   )
+endif()
+
+# DOKAN
+
+if(WITH_DOKAN)
+	# files...
 endif()
 
 # HASH
