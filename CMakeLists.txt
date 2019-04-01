@@ -255,7 +255,8 @@ endif()
 # DOKAN
 
 if(WITH_DOKAN)
-	# files...
+	set(DOKAN_HDRS src/fuse/dokan_service.h)
+	set(DOKAN_SRCS src/fuse/dokan_service.cc)
 endif()
 
 # HASH
@@ -386,6 +387,11 @@ set(STEGODISK_SRCS
 if(FUSE_FOUND)
   set(STEGODISK_HDRS ${STEGODISK_HDRS} ${FUSE_HDRS})
   set(STEGODISK_SRCS ${STEGODISK_SRCS} ${FUSE_SRCS})
+endif()
+
+if(WITH_DOKAN)
+	set(STEGODISK_HDRS ${STEGODISK_HDRS} ${DOKAN_HDRS})
+	set(STEGODISK_SRCS ${STEGODISK_SRCS} ${DOKAN_SRCS})
 endif()
 
 ##############################################################################################################################
