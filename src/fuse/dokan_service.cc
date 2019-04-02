@@ -136,7 +136,7 @@ namespace stego_disk
 		{
 			// log...
 			// error
-			return;
+			return STATUS_END_OF_FILE;
 		}
 
 		if (offset64 + size64 > capacity_)
@@ -165,7 +165,7 @@ namespace stego_disk
 		{
 			// log...
 			// error
-			return;
+			return STATUS_END_OF_FILE;
 		}
 
 		if (Offset64 + size64 > capacity_)

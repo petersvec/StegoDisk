@@ -19,7 +19,7 @@ namespace stego_disk {
 class MemoryBuffer {
 public:
   MemoryBuffer();
-  explicit MemoryBuffer(std::size_t size);
+  MemoryBuffer(std::size_t size);
   MemoryBuffer(const uint8* data, std::size_t length);
 
   MemoryBuffer(const MemoryBuffer& other); // copy constructor
