@@ -7,14 +7,14 @@
 namespace stego_disk
 {
 	/**
-	 * Static variables
-	 */
-	observer_ptr<StegoStorage> stego_storage_ = nullptr;
-	uint64 capacity_ = 0;
-	const std::string file_path_ = "/virtualdisc.iso";
-	std::string mount_point_ = "";
-	PDOKAN_OPERATIONS operations_ = nullptr;
-	PDOKAN_OPTIONS options_ = nullptr;
+	* Static variables
+	*/
+	observer_ptr<StegoStorage> DokanService::stego_storage_ = nullptr;
+	uint64 DokanService::capacity_ = 0;
+	const std::string DokanService::file_path_ = "/virtualdisc.iso";
+	std::string DokanService::mount_point_ = "";
+	PDOKAN_OPERATIONS DokanService::operations_ = nullptr;
+	PDOKAN_OPTIONS DokanService::options_ = nullptr;
 
 	DokanService::DokanService()
 	{
@@ -93,12 +93,12 @@ namespace stego_disk
 		WIN32_FIND_DATAW file_info;
 		auto file_time = GetCurrentFileTime();
 
-		file_info.nFileSizeLow = capacity_;
+		file_info.nFileSizeLow = DokanService::capacity_;
 		file_info.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
 		file_info.ftCreationTime = file_time;
 		file_info.ftLastAccessTime = file_time;
 		file_info.ftLastWriteTime = file_time;
-		CopyMemory(file_info.cFileName, StringToLPCWSTR(file_path_), file_path_.size());
+		CopyMemory(file_info.cFileName, StringToLPCWSTR(DokanService::file_path_), DokanService::file_path_.size());
 
 		FillFindData(&file_info, DokanFileInfo);
 
@@ -124,7 +124,7 @@ namespace stego_disk
 
 	NTSTATUS DOKAN_CALLBACK SFSReadFile(LPCWSTR FileName, LPVOID Buffer, DWORD BufferLength, LPDWORD ReadLength, LONGLONG Offset, PDOKAN_FILE_INFO DokanFileInfo)
 	{
-		if (LPCWSTRToString(FileName) != file_path_)
+		if (LPCWSTRToString(FileName) != DokanService::file_path_)
 		{
 			return STATUS_NO_SUCH_FILE;
 		}
@@ -132,28 +132,28 @@ namespace stego_disk
 		uint64 offset64 = Offset;
 		uint64 size64 = BufferLength;
 
-		if (offset64 >= capacity_)
+		if (offset64 >= DokanService::capacity_)
 		{
 			// log...
 			// error
 			return STATUS_END_OF_FILE;
 		}
 
-		if (offset64 + size64 > capacity_)
+		if (offset64 + size64 > DokanService::capacity_)
 		{
 			// log...
-			size64 = capacity_ - offset64;
+			size64 = DokanService::capacity_ - offset64;
 		}
 
 		// try catch?
-		stego_storage_->Read(Buffer, offset64, size64);
+		DokanService::stego_storage_->Read(Buffer, offset64, size64);
 
 		return STATUS_SUCCESS;
 	}
 
 	NTSTATUS DOKAN_CALLBACK SFSWriteFile(LPCWSTR FileName, LPCVOID Buffer, DWORD NumberOfBytesToWrite, LPDWORD NumberOfBytesWritten, LONGLONG Offset, PDOKAN_FILE_INFO DokanFileInfo)
 	{
-		if (LPCWSTRToString(FileName) != file_path_)
+		if (LPCWSTRToString(FileName) != DokanService::file_path_)
 		{
 			return STATUS_NO_SUCH_FILE;
 		}
@@ -161,21 +161,21 @@ namespace stego_disk
 		uint64 Offset64 = Offset;
 		uint64 size64 = NumberOfBytesToWrite;
 
-		if (Offset64 >= capacity_)
+		if (Offset64 >= DokanService::capacity_)
 		{
 			// log...
 			// error
 			return STATUS_END_OF_FILE;
 		}
 
-		if (Offset64 + size64 > capacity_)
+		if (Offset64 + size64 > DokanService::capacity_)
 		{
 			// log...
-			size64 = capacity_ - Offset64;
+			size64 = DokanService::capacity_ - Offset64;
 		}
 
 		// try catch?
-		stego_storage_->Write(Buffer, Offset64, size64);
+		DokanService::stego_storage_->Write(Buffer, Offset64, size64);
 
 		return STATUS_SUCCESS;
 	}
