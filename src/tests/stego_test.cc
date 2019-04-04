@@ -203,8 +203,8 @@ int main(int argc, char *argv[]) {
     std::cout << dir << std::endl;
     dir = DST_DIRECTORY + dir;
     std::cout << dir << std::endl;
-    FileManager::RemoveDirectory(dir);
-    FileManager::CopyDirectory(SRC_DIRECTORY, dir);
+    FileManager::RemoveDir(dir);
+    FileManager::CopyDir(SRC_DIRECTORY, dir);
   }
   if (dir.empty()) {
     LOG_ERROR("directory was not set");
@@ -268,7 +268,7 @@ int main(int argc, char *argv[]) {
   LOG_DEBUG("Reading from the storage");
   stego_storage->Read(&(output[0]), 0, input.size());
 
-  if(test_directory) FileManager::RemoveDirectory(dir);
+  if(test_directory) FileManager::RemoveDir(dir);
 
   if (input != output) {
     LOG_ERROR("Not equal! Input size: " << input.size() <<
