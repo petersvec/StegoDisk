@@ -11,8 +11,8 @@ namespace stego_disk
 	*/
 	observer_ptr<StegoStorage> DokanService::stego_storage_ = nullptr;
 	uint64 DokanService::capacity_ = 0;
-	const std::string DokanService::file_path_ = "/virtualdisc.iso";
-	std::string DokanService::mount_point_ = "";
+	std::wstring DokanService::file_path_;
+	std::wstring DokanService::mount_point_;
 	PDOKAN_OPERATIONS DokanService::operations_ = nullptr;
 	PDOKAN_OPTIONS DokanService::options_ = nullptr;
 
@@ -25,45 +25,49 @@ namespace stego_disk
 	{
 		LOG_INFO("Initializing Dokan");
 
-		if (stego_storage_)
+		const std::string path = "virtualdisc.iso";
+		DokanService::file_path_ = std::wstring(path.begin(), path.end());
+
+		if (stego_storage)
 		{
-			capacity_ = stego_storage_->GetSize();
+			capacity_ = stego_storage->GetSize();
+			stego_storage_ = stego_storage;
 		}
 
-		mount_point_ = mount_point;
+		mount_point_ = StringToWString(mount_point);
 
 		operations_ = static_cast<PDOKAN_OPERATIONS>(malloc(sizeof(PDOKAN_OPERATIONS)));
 		options_ = static_cast<PDOKAN_OPTIONS>(malloc(sizeof(PDOKAN_OPTIONS)));
 
-		ZeroMemory(options_, sizeof(PDOKAN_OPTIONS));
+		ZeroMemory(DokanService::options_, sizeof(DOKAN_OPTIONS));
 		options_->Version = DOKAN_VERSION;
-		options_->MountPoint = StringToLPCWSTR(mount_point_);
+		options_->MountPoint = mount_point_.c_str();
 
-		ZeroMemory(operations_, sizeof(PDOKAN_OPERATIONS));
-		operations_->ZwCreateFile = SFSCreateFile;
-		operations_->FindFiles = SFSFindFiles;
-		operations_->Mounted = SFSMounted;
-		operations_->Unmounted = SFSUnmounted;
-		operations_->GetVolumeInformation = SFSGetVolumeInformation;
-		operations_->ReadFile = SFSReadFile;
-		operations_->WriteFile = SFSWriteFile;
+		ZeroMemory(DokanService::operations_, sizeof(DOKAN_OPERATIONS));
+		operations_->ZwCreateFile = stego_disk::SFSCreateFile;
+		operations_->FindFiles = stego_disk::SFSFindFiles;
+		operations_->Mounted = stego_disk::SFSMounted;
+		operations_->Unmounted = stego_disk::SFSUnmounted;
+		operations_->GetVolumeInformation = stego_disk::SFSGetVolumeInformation;
+		operations_->ReadFile = stego_disk::SFSReadFile;
+		operations_->WriteFile = stego_disk::SFSWriteFile;
 	}
 
 	void DokanService::Mount()
 	{
 		LOG_INFO("Mounting Dokan");
 
-		std::thread th([]() {
-			DokanMain(options_, operations_);
-		});
+		//std::thread th([]() {
+			DokanMain(DokanService::options_, DokanService::operations_);
+		//});
 		
-		th.detach();
+		//th.detach();
 	}
 
-	LPCWSTR StringToLPCWSTR(const std::string &str)
+	std::wstring StringToWString(const std::string &str)
 	{
 		std::wstring temp = std::wstring(str.begin(), str.end());
-		return temp.c_str();
+		return temp;
 	}
 
 	FILETIME GetCurrentFileTime()
@@ -98,7 +102,13 @@ namespace stego_disk
 		file_info.ftCreationTime = file_time;
 		file_info.ftLastAccessTime = file_time;
 		file_info.ftLastWriteTime = file_time;
-		CopyMemory(file_info.cFileName, StringToLPCWSTR(DokanService::file_path_), DokanService::file_path_.size());
+
+		auto i{ 0u };
+		for (i = 0u; i < DokanService::file_path_.size(); i++)
+		{
+			file_info.cFileName[i] = DokanService::file_path_[i];
+		}
+		file_info.cFileName[i] = '\0';
 
 		FillFindData(&file_info, DokanFileInfo);
 
@@ -124,7 +134,7 @@ namespace stego_disk
 
 	NTSTATUS DOKAN_CALLBACK SFSReadFile(LPCWSTR FileName, LPVOID Buffer, DWORD BufferLength, LPDWORD ReadLength, LONGLONG Offset, PDOKAN_FILE_INFO DokanFileInfo)
 	{
-		if (LPCWSTRToString(FileName) != DokanService::file_path_)
+		if (wcscmp(FileName, DokanService::file_path_.c_str()) != 0)
 		{
 			return STATUS_NO_SUCH_FILE;
 		}
@@ -153,7 +163,7 @@ namespace stego_disk
 
 	NTSTATUS DOKAN_CALLBACK SFSWriteFile(LPCWSTR FileName, LPCVOID Buffer, DWORD NumberOfBytesToWrite, LPDWORD NumberOfBytesWritten, LONGLONG Offset, PDOKAN_FILE_INFO DokanFileInfo)
 	{
-		if (LPCWSTRToString(FileName) != DokanService::file_path_)
+		if (wcscmp(FileName, DokanService::file_path_.c_str()) != 0)
 		{
 			return STATUS_NO_SUCH_FILE;
 		}

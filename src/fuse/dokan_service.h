@@ -3,6 +3,8 @@
 #include <dokan/dokan.h>
 #include <dokan/fileinfo.h>
 #include <string>
+#include <WinBase.h>
+#include <stdlib.h>
 
 #include "stego-disk_export.h"
 #include "utils/non_copyable.h"
@@ -24,7 +26,7 @@ namespace stego_disk
 	/**
 	 * Helper functions
 	 */
-	static LPCWSTR StringToLPCWSTR(const std::string &str);
+	static std::wstring StringToWString(const std::string &str);
 	static FILETIME GetCurrentFileTime();
 	static std::string LPCWSTRToString(LPCWSTR str);
 
@@ -48,8 +50,8 @@ namespace stego_disk
 
 		static observer_ptr<StegoStorage> stego_storage_;
 		static uint64 capacity_;
-		static const std::string file_path_;
-		static std::string mount_point_;
+		static std::wstring file_path_;
+		static std::wstring mount_point_;
 		static PDOKAN_OPERATIONS operations_;
 		static PDOKAN_OPTIONS options_;
 	};
