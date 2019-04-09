@@ -46,6 +46,10 @@ if(FUSE_FOUND)
   add_executable(stego-fuse-test stego_fuse_test.cc)
 endif()
 
+if(WITH_DOKAN)
+  add_executable(stego-dokan-test stego_dokan_test.cc)
+endif()
+
 if(NOT WIN32)
 	set(LIBJPEGTURBO_LIBRARIES_STATIC ${CMAKE_BINARY_DIR}/${LIBDIR}/libjpeg.a)
 else()
@@ -58,11 +62,16 @@ if(NOT BUILD_SHARED_LIBS)
   set(STEGO_TEST_LIBRARIES ${STEGO_TEST_LIBRARIES} ${LIBJPEGTURBO_LIBRARIES_STATIC})
 endif()
 set(STEGO_FUSE_TEST_LIBRARIES ${STEGO_TEST_LIBRARIES} ${FUSE_LIBRARIES})
+set(STEGO_DOKAN_TEST_LIBRARIES ${STEGO_TEST_LIBRARIES})
 
 target_link_libraries(stego-test ${STEGO_TEST_LIBRARIES})
 
 if(FUSE_FOUND)
   target_link_libraries(stego-fuse-test ${STEGO_FUSE_TEST_LIBRARIES})
+endif()
+
+if(WITH_DOKAN)
+	target_link_libraries(stego-dokan-test ${STEGO_DOKAN_TEST_LIBRARIES})
 endif()
 
 list(APPEND TESTS stego-test)
