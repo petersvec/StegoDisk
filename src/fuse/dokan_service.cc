@@ -51,18 +51,25 @@ namespace stego_disk
 		operations_->GetVolumeInformation = stego_disk::SFSGetVolumeInformation;
 		operations_->ReadFile = stego_disk::SFSReadFile;
 		operations_->WriteFile = stego_disk::SFSWriteFile;
+		operations_->GetFileInformation = stego_disk::SFSGetFileInformation;
 	}
 
 	void DokanService::Mount()
 	{
 		LOG_INFO("Mounting Dokan");
 
-		//std::thread th([]() {
+		std::thread th([]() {
 			DokanMain(DokanService::options_, DokanService::operations_);
-		//});
+		});
 		
-		//th.detach();
+		th.detach();
 	}
+
+	void DokanService::Unmount()
+	{
+		LOG_INFO("Unmounting Dokan");
+		DokanUnmount(DokanService::mount_point_[0]);
+	}	
 
 	std::wstring StringToWString(const std::string &str)
 	{
@@ -89,15 +96,32 @@ namespace stego_disk
 
 	NTSTATUS DOKAN_CALLBACK SFSCreateFile(LPCWSTR FileName, PDOKAN_IO_SECURITY_CONTEXT SecurityContext, ACCESS_MASK DesiredAccess, ULONG FileAttributes, ULONG ShareAccess, ULONG CreateDisposition, ULONG CreateOptions, PDOKAN_FILE_INFO DokanFileInfo)
 	{
-		return STATUS_SUCCESS;
+		LOG_DEBUG("SFSCreateFile");
+
+		if (wcscmp(FileName, std::wstring(1, '\\').c_str()) == 0)
+		{
+			DokanFileInfo->IsDirectory = TRUE;
+			return STATUS_SUCCESS;
+		}
+
+		if (wcscmp(FileName, DokanService::file_path_.c_str()) == 0)
+		{
+			DokanFileInfo->IsDirectory = FALSE;
+			return STATUS_SUCCESS;
+		}
+
+		return STATUS_NO_SUCH_FILE;
 	}
 
 	NTSTATUS DOKAN_CALLBACK SFSFindFiles(LPCWSTR FileName, PFillFindData FillFindData, PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		LOG_DEBUG("SFSFindFiles");
+
 		WIN32_FIND_DATAW file_info;
 		auto file_time = GetCurrentFileTime();
 
 		file_info.nFileSizeLow = DokanService::capacity_;
+		file_info.nFileSizeHigh = 0;
 		file_info.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
 		file_info.ftCreationTime = file_time;
 		file_info.ftLastAccessTime = file_time;
@@ -117,23 +141,29 @@ namespace stego_disk
 
 	NTSTATUS DOKAN_CALLBACK SFSMounted(PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		LOG_DEBUG("SFSMounted");
 		return STATUS_SUCCESS;
 	}
 
 	NTSTATUS DOKAN_CALLBACK SFSUnmounted(PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		LOG_DEBUG("SFSUnmounted");
 		return STATUS_SUCCESS;
 	}
 
 	NTSTATUS DOKAN_CALLBACK SFSGetVolumeInformation(LPWSTR VolumeNameBuffer, DWORD VolumeNameSize, LPDWORD VolumeSerialNumber, LPDWORD MaximumComponentLength, LPDWORD FileSystemFlags, LPWSTR FileSystemNameBuffer, DWORD FileSystemNameSize, PDOKAN_FILE_INFO DokanFileInfo)
 	{
-		// TODO:
+		LOG_DEBUG("SFSGetVolumeInformation");
+
+		//wcscpy_s(VolumeNameBuffer, VolumeNameSize, L"StegoDisk");
 
 		return STATUS_SUCCESS;
 	}
 
 	NTSTATUS DOKAN_CALLBACK SFSReadFile(LPCWSTR FileName, LPVOID Buffer, DWORD BufferLength, LPDWORD ReadLength, LONGLONG Offset, PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		LOG_DEBUG("SFSReadFile");
+
 		if (wcscmp(FileName, DokanService::file_path_.c_str()) != 0)
 		{
 			return STATUS_NO_SUCH_FILE;
@@ -144,15 +174,21 @@ namespace stego_disk
 
 		if (offset64 >= DokanService::capacity_)
 		{
-			// log...
-			// error
+			LOG_ERROR("Trying to read past the end of storage!");
+			LOG_DEBUG("File: " + std::string(DokanService::file_path_.begin(), DokanService::file_path_.end()) +
+					  " offset: " + std::to_string(offset64) + 
+					  " size: " + std::to_string(size64));
 			return STATUS_END_OF_FILE;
 		}
 
 		if (offset64 + size64 > DokanService::capacity_)
 		{
-			// log...
+			LOG_INFO("Trim the read to file size!");
 			size64 = DokanService::capacity_ - offset64;
+			LOG_DEBUG("File: " + std::string(DokanService::file_path_.begin(), DokanService::file_path_.end()) +
+					  " capacity: " + std::to_string(DokanService::capacity_) +
+					  " offset: " + std::to_string(offset64) +
+					  " size: " + std::to_string(size64));
 		}
 
 		// try catch?
@@ -163,30 +199,67 @@ namespace stego_disk
 
 	NTSTATUS DOKAN_CALLBACK SFSWriteFile(LPCWSTR FileName, LPCVOID Buffer, DWORD NumberOfBytesToWrite, LPDWORD NumberOfBytesWritten, LONGLONG Offset, PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		LOG_DEBUG("SFSWriteFile");
+
 		if (wcscmp(FileName, DokanService::file_path_.c_str()) != 0)
 		{
 			return STATUS_NO_SUCH_FILE;
 		}
 
-		uint64 Offset64 = Offset;
+		uint64 offset64 = Offset;
 		uint64 size64 = NumberOfBytesToWrite;
 
-		if (Offset64 >= DokanService::capacity_)
+		if (offset64 >= DokanService::capacity_)
 		{
-			// log...
-			// error
+			LOG_ERROR("Trying to write past the end of storage!");
+			LOG_DEBUG("File: " + std::string(DokanService::file_path_.begin(), DokanService::file_path_.end()) +
+				" offset: " + std::to_string(offset64) +
+				" size: " + std::to_string(size64));
 			return STATUS_END_OF_FILE;
 		}
 
-		if (Offset64 + size64 > DokanService::capacity_)
+		if (offset64 + size64 > DokanService::capacity_)
 		{
-			// log...
-			size64 = DokanService::capacity_ - Offset64;
+			LOG_INFO("Trim the write to file size!");
+			size64 = DokanService::capacity_ - offset64;
+			LOG_DEBUG("File: " + std::string(DokanService::file_path_.begin(), DokanService::file_path_.end()) +
+				" capacity: " + std::to_string(DokanService::capacity_) +
+				" offset: " + std::to_string(offset64) +
+				" size: " + std::to_string(size64));
 		}
 
 		// try catch?
-		DokanService::stego_storage_->Write(Buffer, Offset64, size64);
+		DokanService::stego_storage_->Write(Buffer, offset64, size64);
 
 		return STATUS_SUCCESS;
+	}
+
+	NTSTATUS DOKAN_CALLBACK SFSGetFileInformation(LPCWSTR FileName, LPBY_HANDLE_FILE_INFORMATION HandleFileInformation, PDOKAN_FILE_INFO DokanFileInfo)
+	{
+		LOG_DEBUG("SFSGetFileInformation");
+
+		auto file_time = GetCurrentFileTime();
+
+		if (wcscmp(FileName, std::wstring(1, '\\').c_str()) == 0)
+		{
+			HandleFileInformation->dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+			HandleFileInformation->ftCreationTime = file_time;
+			HandleFileInformation->ftLastAccessTime = file_time;
+			HandleFileInformation->ftLastWriteTime = file_time;
+			return STATUS_SUCCESS;
+		}
+
+		if (wcscmp(FileName, DokanService::file_path_.c_str()) == 0)
+		{
+			HandleFileInformation->dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+			HandleFileInformation->ftCreationTime = file_time;
+			HandleFileInformation->ftLastAccessTime = file_time;
+			HandleFileInformation->ftLastWriteTime = file_time;
+			HandleFileInformation->nFileSizeLow = DokanService::capacity_;
+			HandleFileInformation->nFileSizeHigh = 0;
+			return STATUS_SUCCESS;
+		}
+
+		return STATUS_NO_SUCH_FILE;
 	}
 }
