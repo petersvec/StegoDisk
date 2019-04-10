@@ -16,6 +16,7 @@
 
 LoggerVerbosityLevel Logger::verbosity_level_ = LoggerVerbosityLevel::kLoggerVerbosityDisabled;
 std::ostream *Logger::ofs_ = &std::cout;
+std::mutex Logger::log_mutex_;
 
 bool Logger::ShouldPrint(LoggerVerbosityLevel verbosity_level) {
   if (verbosity_level_ == LoggerVerbosityLevel::kLoggerVerbosityDisabled) return false;
