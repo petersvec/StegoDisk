@@ -5,6 +5,9 @@
 #include <string>
 #include <WinBase.h>
 #include <stdlib.h>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #include "stego-disk_export.h"
 #include "utils/non_copyable.h"
@@ -49,6 +52,7 @@ namespace stego_disk
 		static void Init(observer_ptr<StegoStorage> stego_storage, const std::string &mount_point);
 		static void Mount();
 		static void Unmount();
+		static void IsMounted();
 
 		static observer_ptr<StegoStorage> stego_storage_;
 		static uint64 capacity_;
@@ -56,5 +60,8 @@ namespace stego_disk
 		static std::wstring mount_point_;
 		static PDOKAN_OPERATIONS operations_;
 		static PDOKAN_OPTIONS options_;
+		static std::mutex dokan_mutex_;
+		static std::mutex mount_mutex_;
+		static std::condition_variable mount_ready_;
 	};
 }

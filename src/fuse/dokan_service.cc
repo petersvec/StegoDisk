@@ -2,8 +2,6 @@
 #include "stego_storage.h"
 #include "logging/logger.h"
 
-#include <thread>
-
 namespace stego_disk
 {
 	/**
@@ -15,6 +13,9 @@ namespace stego_disk
 	std::wstring DokanService::mount_point_;
 	PDOKAN_OPERATIONS DokanService::operations_ = nullptr;
 	PDOKAN_OPTIONS DokanService::options_ = nullptr;
+	std::mutex DokanService::dokan_mutex_;
+	std::mutex DokanService::mount_mutex_;
+	std::condition_variable DokanService::mount_ready_;
 
 	DokanService::DokanService()
 	{
@@ -56,6 +57,7 @@ namespace stego_disk
 
 	void DokanService::Mount()
 	{
+		std::lock_guard<std::mutex> lock(DokanService::dokan_mutex_);
 		LOG_INFO("Mounting Dokan");
 
 		std::thread th([]() {
@@ -67,9 +69,17 @@ namespace stego_disk
 
 	void DokanService::Unmount()
 	{
+		std::lock_guard<std::mutex> lock(DokanService::dokan_mutex_);
 		LOG_INFO("Unmounting Dokan");
 		DokanUnmount(DokanService::mount_point_[0]);
 	}	
+
+	// blocks until storage is mounted
+	void DokanService::IsMounted()
+	{
+		std::unique_lock<std::mutex> lock(DokanService::mount_mutex_);
+		DokanService::mount_ready_.wait(lock);
+	}
 
 	std::wstring StringToWString(const std::string &str)
 	{
@@ -96,6 +106,7 @@ namespace stego_disk
 
 	NTSTATUS DOKAN_CALLBACK SFSCreateFile(LPCWSTR FileName, PDOKAN_IO_SECURITY_CONTEXT SecurityContext, ACCESS_MASK DesiredAccess, ULONG FileAttributes, ULONG ShareAccess, ULONG CreateDisposition, ULONG CreateOptions, PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		std::lock_guard<std::mutex> lock(DokanService::dokan_mutex_);
 		LOG_DEBUG("SFSCreateFile");
 
 		if (wcscmp(FileName, std::wstring(1, '\\').c_str()) == 0)
@@ -115,44 +126,55 @@ namespace stego_disk
 
 	NTSTATUS DOKAN_CALLBACK SFSFindFiles(LPCWSTR FileName, PFillFindData FillFindData, PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		std::lock_guard<std::mutex> lock(DokanService::dokan_mutex_);
 		LOG_DEBUG("SFSFindFiles");
 
-		WIN32_FIND_DATAW file_info;
-		auto file_time = GetCurrentFileTime();
-
-		file_info.nFileSizeLow = DokanService::capacity_;
-		file_info.nFileSizeHigh = 0;
-		file_info.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
-		file_info.ftCreationTime = file_time;
-		file_info.ftLastAccessTime = file_time;
-		file_info.ftLastWriteTime = file_time;
-
-		auto i{ 0u };
-		for (i = 0u; i < DokanService::file_path_.size(); i++)
+		if (wcscmp(FileName, std::wstring(1, '\\').c_str()) == 0)
 		{
-			file_info.cFileName[i] = DokanService::file_path_[i];
+
+			WIN32_FIND_DATAW file_info;
+			auto file_time = GetCurrentFileTime();
+
+			file_info.nFileSizeLow = DokanService::capacity_;
+			file_info.nFileSizeHigh = 0;
+			file_info.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+			file_info.ftCreationTime = file_time;
+			file_info.ftLastAccessTime = file_time;
+			file_info.ftLastWriteTime = file_time;
+
+			auto i{ 0u };
+			for (i = 0u; i < DokanService::file_path_.size(); i++)
+			{
+				file_info.cFileName[i] = DokanService::file_path_[i];
+			}
+			file_info.cFileName[i] = '\0';
+
+			FillFindData(&file_info, DokanFileInfo);
+
+			return STATUS_SUCCESS;
 		}
-		file_info.cFileName[i] = '\0';
 
-		FillFindData(&file_info, DokanFileInfo);
-
-		return STATUS_SUCCESS;
+		return STATUS_END_OF_FILE;
 	}
 
 	NTSTATUS DOKAN_CALLBACK SFSMounted(PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		std::lock_guard<std::mutex> lock(DokanService::dokan_mutex_);
 		LOG_DEBUG("SFSMounted");
+		DokanService::mount_ready_.notify_one();
 		return STATUS_SUCCESS;
 	}
 
 	NTSTATUS DOKAN_CALLBACK SFSUnmounted(PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		std::lock_guard<std::mutex> lock(DokanService::dokan_mutex_);
 		LOG_DEBUG("SFSUnmounted");
 		return STATUS_SUCCESS;
 	}
 
 	NTSTATUS DOKAN_CALLBACK SFSGetVolumeInformation(LPWSTR VolumeNameBuffer, DWORD VolumeNameSize, LPDWORD VolumeSerialNumber, LPDWORD MaximumComponentLength, LPDWORD FileSystemFlags, LPWSTR FileSystemNameBuffer, DWORD FileSystemNameSize, PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		std::lock_guard<std::mutex> lock(DokanService::dokan_mutex_);
 		LOG_DEBUG("SFSGetVolumeInformation");
 
 		//wcscpy_s(VolumeNameBuffer, VolumeNameSize, L"StegoDisk");
@@ -162,6 +184,7 @@ namespace stego_disk
 
 	NTSTATUS DOKAN_CALLBACK SFSReadFile(LPCWSTR FileName, LPVOID Buffer, DWORD BufferLength, LPDWORD ReadLength, LONGLONG Offset, PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		std::lock_guard<std::mutex> lock(DokanService::dokan_mutex_);
 		LOG_DEBUG("SFSReadFile");
 
 		if (wcscmp(FileName, DokanService::file_path_.c_str()) != 0)
@@ -199,6 +222,7 @@ namespace stego_disk
 
 	NTSTATUS DOKAN_CALLBACK SFSWriteFile(LPCWSTR FileName, LPCVOID Buffer, DWORD NumberOfBytesToWrite, LPDWORD NumberOfBytesWritten, LONGLONG Offset, PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		std::lock_guard<std::mutex> lock(DokanService::dokan_mutex_);
 		LOG_DEBUG("SFSWriteFile");
 
 		if (wcscmp(FileName, DokanService::file_path_.c_str()) != 0)
@@ -236,6 +260,7 @@ namespace stego_disk
 
 	NTSTATUS DOKAN_CALLBACK SFSGetFileInformation(LPCWSTR FileName, LPBY_HANDLE_FILE_INFORMATION HandleFileInformation, PDOKAN_FILE_INFO DokanFileInfo)
 	{
+		std::lock_guard<std::mutex> lock(DokanService::dokan_mutex_);
 		LOG_DEBUG("SFSGetFileInformation");
 
 		auto file_time = GetCurrentFileTime();
