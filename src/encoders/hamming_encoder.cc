@@ -13,7 +13,6 @@
 #include "utils/stego_errors.h"
 #include "utils/stego_math.h"
 
-#include <string.h>
 #include <algorithm>
 
 namespace stego_disk {
@@ -194,11 +193,11 @@ HammingEncoder::HammingEncoder(uint32 parity_bits) {
  *     - std::invalid_argument, if 'val' is not a number
  *     - std::out_of_range, if 'val' is not from range <GetParityBitsMin(); GetParityBitsMax()>
  */
-void HammingEncoder::SetArgByName(const std::string &param, const std::string &val) {
+void HammingEncoder::SetArgByName(std::string_view arg, std::string_view val) {
   bool is_valid_param = false;
-  std::string p = param;
+  std::string p = std::string(arg);
 
-  if (param.empty())
+  if (arg.empty())
     throw exception::EmptyArgument{"param"};
   if (val.empty())
     throw exception::EmptyArgument{"val"};
@@ -210,7 +209,7 @@ void HammingEncoder::SetArgByName(const std::string &param, const std::string &v
     int parity_bits;
 
     is_valid_param = true;
-    try { parity_bits = stoi(val); }
+    try { parity_bits = atoi(val.data()); }
     catch (const std::invalid_argument& ) { throw; }
     catch (const std::out_of_range& ) { throw; }
 
@@ -229,7 +228,7 @@ void HammingEncoder::SetArgByName(const std::string &param, const std::string &v
   // if is not valid parameter
   if (is_valid_param == false)
     throw std::invalid_argument("HammingEncoder::setArgByName: "
-                                "unknown class parameter '" + param + "'");
+                                "unknown class parameter '" + std::string(arg) + "'");
 }
 
 /**

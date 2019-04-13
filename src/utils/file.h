@@ -55,7 +55,7 @@ public:
 
   static std::string NormalizePath(std::string platform_specific_path);
 
-  static std::vector<File> GetFilesInDir(const std::string &directory, const std::string &filter = "");
+  static std::vector<File> GetFilesInDir(std::string_view directory, std::string_view filter = "");
 
   FilePtr Open();
 

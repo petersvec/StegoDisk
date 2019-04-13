@@ -36,7 +36,7 @@ Hash::Hash() {
 }
 
 
-Hash::Hash(const std::string& data) {
+Hash::Hash(std::string_view data) {
   Init();
   Process(data);
 }
@@ -46,12 +46,12 @@ Hash::Hash(const uint8* data, std::size_t length) {
   Process(data, length);
 }
 
-void Hash::Process(const std::string& data) {
+void Hash::Process(std::string_view data) {
   if (default_hash_impl_ == nullptr)
     throw exception::MissingDefault{"hash implementation"};
 
   default_hash_impl_->Process(*state_,
-                              (uint8*)data.c_str(),
+                              (uint8*)data.data(),
                               data.length());
 }
 
@@ -74,12 +74,12 @@ void Hash::Process(const uint8* data, std::size_t length) {
   default_hash_impl_->Process(*state_, data, length);
 }
 
-void Hash::Append(const std::string& data) {
+void Hash::Append(std::string_view data) {
   if (default_hash_impl_ == nullptr)
     throw exception::MissingDefault{"hash implementation"};
 
   default_hash_impl_->Append(*state_,
-                             (uint8*)data.c_str(),
+                             (uint8*)data.data(),
                              data.length());
 }
 

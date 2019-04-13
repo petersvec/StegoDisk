@@ -28,7 +28,7 @@ public:
 
   virtual uint32 GetDataBlockSize();
   virtual uint32 GetCodewordBlockSize();
-  virtual void SetArgByName(const std::string &arg, const std::string &val) = 0;
+  virtual void SetArgByName(std::string_view arg, std::string_view val) = 0;
 
   virtual const std::string GetNameInstance() const = 0;
   virtual std::shared_ptr<Encoder> GetNewInstance() = 0;

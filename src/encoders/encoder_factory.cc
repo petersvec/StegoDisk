@@ -78,8 +78,8 @@ std::vector<std::shared_ptr<Encoder>> EncoderFactory::GetAllEncoders() {
  * @return A std::exception if some error occurs in encoder->setArgByName()
  */
 void EncoderFactory::SetEncoderArg(std::shared_ptr<Encoder> encoder,
-                                         const std::string &param,
-                                         const std::string &val) {
+                                         std::string_view param,
+                                         std::string_view val) {
   if (!encoder)
     throw exception::NullptrArgument{"encoder"};
   if (param.empty())
@@ -152,26 +152,28 @@ std::shared_ptr<Encoder> EncoderFactory::GetEncoder(const EncoderType encoder) {
   }
 }
 
-
-EncoderFactory::EncoderType EncoderFactory::GetEncoderType(const std::string &encoder) {
-  std::string l_encoder(encoder.size(), '\0');
-  std::transform(encoder.begin(), encoder.end(), l_encoder.begin(), ::tolower);
-
-  if (l_encoder == "lsb") {
-    return EncoderType::LSB;
-  } else if (l_encoder == "hamming"){
-    return EncoderType::HAMMING;
-  } else {
-    return GetDefaultEncoderType();
-  }
-}
-
 const std::string EncoderFactory::GetEncoderName(const EncoderType encoder) {
   if (encoder == EncoderType::LSB) {
     return "lsb";
   } else {
     return "hamming";
   }
+}
+
+stego_disk::EncoderFactory::EncoderType EncoderFactory::GetEncoderType(std::string_view encoder)
+{
+	std::string l_encoder(encoder.size(), '\0');
+	std::transform(encoder.begin(), encoder.end(), l_encoder.begin(), ::tolower);
+
+	if (l_encoder == "lsb") {
+		return EncoderType::LSB;
+	}
+	else if (l_encoder == "hamming") {
+		return EncoderType::HAMMING;
+	}
+	else {
+		return GetDefaultEncoderType();
+	}
 }
 
 } // stego_disk

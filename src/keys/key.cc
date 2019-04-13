@@ -33,7 +33,7 @@ std::size_t Key::GetSize() {
     return data_->GetSize();
 }
 
-Key Key::FromString(std::string input) {
+stego_disk::Key Key::FromString(std::string_view input) {
     return Key(Hash(input).GetState());
 }
 

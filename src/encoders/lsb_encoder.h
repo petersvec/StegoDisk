@@ -24,7 +24,7 @@ public:
 	virtual int Embed(uint8 *codeword, const uint8 *data) override;
 	virtual int Extract(const uint8 *codeword, uint8 *data) override;
 
-	virtual void SetArgByName(const std::string &arg, const std::string &val) override;
+	virtual void SetArgByName(std::string_view arg, std::string_view val) override;
 
     static std::shared_ptr<Encoder> GetNew();
 	virtual std::shared_ptr<Encoder> GetNewInstance() override;

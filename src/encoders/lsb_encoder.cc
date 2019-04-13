@@ -225,11 +225,11 @@ int LsbEncoder::Extract(const uint8 *codeword, uint8 *data) {
  *     - std::invalid_argument, if 'val' is not a number
  *     - std::out_of_range, if 'val' is not from range <GetBlockSizeMin(); GetBlockSizeMax()>, or is not a power of two
  */
-void LsbEncoder::SetArgByName(const std::string &param, const std::string &val) {
+void LsbEncoder::SetArgByName(std::string_view arg, std::string_view val) {
   bool is_valid_param = false;
-  std::string p = param;
+  std::string p = std::string(arg);
 
-  if (param.empty())
+  if (arg.empty())
     exception::EmptyArgument{"param"};
   if (val.empty())
     exception::EmptyArgument{"val"};
@@ -241,7 +241,7 @@ void LsbEncoder::SetArgByName(const std::string &param, const std::string &val) 
     int block_size;
 
     is_valid_param = true;
-    try { block_size = stoi(val); }
+    try { block_size = atoi(val.data()); }
     catch (const std::invalid_argument& ) { throw; }
     catch (const std::out_of_range& ) { throw; }
 
@@ -260,7 +260,7 @@ void LsbEncoder::SetArgByName(const std::string &param, const std::string &val) 
   if (is_valid_param == false)
     throw std::invalid_argument("LsbEncoder::setArgByName: "
                                 "unknown class parameter '" +
-                                param + "'");
+                                std::string(arg) + "'");
 }
 
 } // stego_disk

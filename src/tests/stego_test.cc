@@ -20,10 +20,14 @@
 
 #include "tests/test_config.h"
 
+//////////////////////////////////////////////////////////////////////////
+#include "fuse/dokan_service.h"
+#include <thread>
+//////////////////////////////////////////////////////////////////////////
 
 bool LoggerInit() {
 
-  std::string logging_level("INFO");
+  std::string logging_level("DEBUG");
 
   char *env_logging_level = NULL;
   if ((env_logging_level = getenv("LOGGING_LEVEL"))) {
@@ -230,6 +234,14 @@ int main(int argc, char *argv[]) {
   if( gen_file_size == 0) gen_file_size = size;
   std::string input;
   std::string output;
+
+  //////////////////////////////////////////////////////////////////////////
+  stego_disk::DokanService::Init(stego_storage.get(), "M:\\");
+  stego_disk::DokanService::Mount();
+
+  std::this_thread::sleep_for(std::chrono::seconds(3600));
+  //stego_disk::DokanService::Unmount();
+  //////////////////////////////////////////////////////////////////////////
 
   if ( invert == false ) {
     LOG_DEBUG("Generating random string");

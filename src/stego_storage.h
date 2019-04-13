@@ -32,7 +32,7 @@ public:
   StegoStorage();
   ~StegoStorage();
 
-  void Open(const std::string &storage_base_path, const std::string &password, const std::string &filter = "");
+  void Open(std::string_view storage_base_path, std::string_view password, std::string_view filter = "");
   void Load();
   void Save();
 
@@ -41,7 +41,7 @@ public:
   void Write(const void* source, const std::size_t offset,
              const std::size_t length) const;
 
-  void Configure(const std::string &config_path) const;
+  void Configure(std::string_view config_path) const;
   void Configure() const;
   void Configure(const EncoderFactory::EncoderType encoder,
                  const PermutationFactory::PermutationType global_perm,

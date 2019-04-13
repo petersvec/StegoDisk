@@ -29,7 +29,7 @@ namespace stego_disk
 	/**
 	 * Helper functions
 	 */
-	static std::wstring StringToWString(const std::string &str);
+	static std::wstring StringToWString(std::string_view str);
 	static FILETIME GetCurrentFileTime();
 	static std::string LPCWSTRToString(LPCWSTR str);
 
@@ -49,19 +49,19 @@ namespace stego_disk
 	public:
 		DokanService();
 
-		static void Init(observer_ptr<StegoStorage> stego_storage, const std::string &mount_point);
+		static void Init(observer_ptr<StegoStorage> stego_storage, std::string_view mount_point);
 		static void Mount();
 		static void Unmount();
 		static void IsMounted();
 
-		static observer_ptr<StegoStorage> stego_storage_;
-		static uint64 capacity_;
-		static std::wstring file_path_;
-		static std::wstring mount_point_;
-		static PDOKAN_OPERATIONS operations_;
-		static PDOKAN_OPTIONS options_;
-		static std::mutex dokan_mutex_;
-		static std::mutex mount_mutex_;
-		static std::condition_variable mount_ready_;
+		inline static observer_ptr<StegoStorage> stego_storage_{ nullptr };
+		inline static uint64 capacity_{ 0 };
+		inline static std::wstring file_path_;
+		inline static std::wstring mount_point_;
+		inline static PDOKAN_OPERATIONS operations_{ nullptr };
+		inline static PDOKAN_OPTIONS options_{ nullptr };
+		inline static std::mutex dokan_mutex_;
+		inline static std::mutex mount_mutex_;
+		inline static std::condition_variable mount_ready_;
 	};
 }

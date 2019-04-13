@@ -11,6 +11,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 
 #include "stego-disk_export.h"
 #include "utils/non_copyable.h"
@@ -44,13 +45,13 @@ public:
   static std::shared_ptr<Encoder> GetEncoder(const EncoderType encoder);
   // set encoder param by name
   static void SetEncoderArg(std::shared_ptr<Encoder> encoder,
-                                  const std::string &param, const std::string &val);
+                                  std::string_view param, std::string_view val);
   // Get instance of the default encoder
   static std::shared_ptr<Encoder> GetDefaultEncoder();
 
   static EncoderType GetDefaultEncoderType();
 
-  static EncoderType GetEncoderType(const std::string &encoder);
+  static EncoderType GetEncoderType(std::string_view encoder);
 
   static const std::string GetEncoderName(const EncoderType encoder);
 

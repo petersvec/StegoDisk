@@ -42,7 +42,7 @@ std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance() {
   return virtual_storage;
 }
 
-std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance(std::string permutation) {
+std::shared_ptr<VirtualStorage> VirtualStorage::GetNewInstance(std::string_view permutation) {
   auto virtual_storage = std::make_shared<VirtualStorage>();
   try {
     virtual_storage->SetPermutation(

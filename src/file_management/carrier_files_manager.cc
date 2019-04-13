@@ -54,7 +54,7 @@ std::string CarrierFilesManager::GetPath() const {
   return base_path_;
 }
 
-void CarrierFilesManager::LoadDirectory(const std::string &directory, const std::string &filter) {
+void CarrierFilesManager::LoadDirectory(std::string_view directory, std::string_view filter /*= ""*/) {
 
   carrier_files_.clear();
   capacity_ = 0;
@@ -62,7 +62,7 @@ void CarrierFilesManager::LoadDirectory(const std::string &directory, const std:
 
   base_path_ = directory;
 
-  std::vector<File> files = File::GetFilesInDir(directory, filter);
+  auto files = File::GetFilesInDir(directory, filter);
 
   files_in_directory_ = files.size();
 
@@ -195,8 +195,8 @@ std::string CarrierFilesManager::CreateFilterFromConfig() const
 	}
 }
 
-void CarrierFilesManager::SetEncoderArg(const std::string &param,
-                                        const std::string &val) {
+void CarrierFilesManager::SetEncoderArg(std::string_view param,
+                                        std::string_view val) {
   if (!encoder_)
     throw exception::InvalidState(exception::Operation::setEncoderArg,
                                   exception::Component::encoder,
@@ -261,7 +261,7 @@ void CarrierFilesManager::ApplyEncoder() {
 }
 
 
-void CarrierFilesManager::SetPassword(const std::string &password) {
+void CarrierFilesManager::SetPassword(std::string_view password) {
   password_hash_->Process(password);
   LOG_DEBUG("CarrierFilesManager::SetPassword: Setting password: '"
             << password << "'");

@@ -30,12 +30,12 @@ void Logger::LoggerClose() {
   }
 }
 
-void Logger::SetVerbosityLevel(LoggerVerbosityLevel verbosity_level, std::string out) {
+void Logger::SetVerbosityLevel(LoggerVerbosityLevel verbosity_level, std::string_view out) {
   verbosity_level_ = verbosity_level;
   if ( out.length() != 0 ) {
 
     if (out == "stdout" || out == "cout") ofs_ = &std::cout;
-    else ofs_ = new std::ofstream( out, std::ios::out );
+    else ofs_ = new std::ofstream( out.data(), std::ios::out );
 
     if ( ((std::ofstream*)ofs_)->is_open() ) {
       *ofs_ << "Log started" << std::endl;
@@ -44,7 +44,7 @@ void Logger::SetVerbosityLevel(LoggerVerbosityLevel verbosity_level, std::string
   }
 }
 
-void Logger::SetVerbosityLevel(std::string &verbosity_level, std::string out) {
+void Logger::SetVerbosityLevel(std::string &verbosity_level, std::string_view out) {
   std::transform(verbosity_level.begin(), verbosity_level.end(),
                  verbosity_level.begin(), ::toupper);
 
@@ -67,7 +67,7 @@ void Logger::SetVerbosityLevel(std::string &verbosity_level, std::string out) {
   if ( out.length() != 0 ) {
 
     if (out == "stdout" || out == "cout") ofs_ = &std::cout;
-    else ofs_ = new std::ofstream( out, std::ios::out );
+    else ofs_ = new std::ofstream( out.data(), std::ios::out );
 
     if ( ((std::ofstream*)ofs_)->is_open() ) {
       *ofs_ << "Log started" << std::endl;

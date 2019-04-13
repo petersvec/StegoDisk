@@ -38,7 +38,7 @@ public:
   static std::vector<std::shared_ptr<Permutation>> GetPermutations();
   // get instance of permutation based on the code name
   static std::shared_ptr<Permutation> GetPermutation(
-      const std::string &permutation_name);
+      std::string_view permutation_name);
   // get instance of permutation based on type
   static std::shared_ptr<Permutation> GetPermutation(
       const PermutationType permutation);
@@ -47,7 +47,7 @@ public:
 
   static PermutationType GetDefaultPermutationType();
 
-  static PermutationType GetPermutationType(const std::string &permutation);
+  static PermutationType GetPermutationType(std::string_view permutation);
 
   static const std::string GetPermutationName( const PermutationType permutation);
 

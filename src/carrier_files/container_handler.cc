@@ -4,7 +4,7 @@
 
 namespace stego_disk
 {
-	ContainerHandler::ContainerHandler(const std::string &name)
+	ContainerHandler::ContainerHandler(std::string_view name)
 		:file_name_(name)
 	{
 		Init();
@@ -20,7 +20,7 @@ namespace stego_disk
 
 	}
 
-	void ContainerHandler::SetFileName(const std::string &name)
+	void ContainerHandler::SetFileName(std::string_view name)
 	{
 		file_name_ = name;
 	}

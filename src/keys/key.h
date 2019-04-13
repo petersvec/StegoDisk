@@ -32,7 +32,7 @@ public:
 	  return *data_;
   }
 
-  static Key FromString(std::string input);
+  static Key FromString(std::string_view input);
 
   Key& operator^=(const Key& other);
   Key operator^(const Key& other);

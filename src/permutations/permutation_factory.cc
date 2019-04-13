@@ -69,7 +69,7 @@ std::vector<std::shared_ptr<Permutation>> PermutationFactory::GetPermutations() 
  * @return On success instance of permutation, exception std::invalid_argument otherwise
  */
 std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
-    const std::string &permutation_name) {
+    std::string_view permutation_name) {
 
   std::vector<std::shared_ptr<Permutation> > list;
   std::shared_ptr<Permutation> permutation(nullptr);
@@ -96,7 +96,7 @@ std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
     return permutation;
   throw std::invalid_argument("PermutationFactory::getPermutationByName: "
                               "permutation with name '"
-                              + permutation_name + "' doesn't exist");
+                              + std::string(permutation_name) + "' doesn't exist");
 }
 
 
@@ -120,7 +120,7 @@ std::shared_ptr<Permutation> PermutationFactory::GetPermutation(
 }
 
 PermutationFactory::PermutationType PermutationFactory::GetPermutationType(
-    const std::string &permutation) {
+    std::string_view permutation) {
 
   std::string l_perm(permutation.size(), '\0');
   std::transform(permutation.begin(), permutation.end(), l_perm.begin(), ::tolower);

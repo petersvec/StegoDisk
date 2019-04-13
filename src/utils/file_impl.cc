@@ -10,7 +10,7 @@
 
 namespace stego_disk {
 
-std::vector<File> File::GetFilesInDir(const std::string &directory, const std::string &filter)
+std::vector<stego_disk::File> File::GetFilesInDir(std::string_view directory, std::string_view filter /*= ""*/)
 {
 	std::vector<File> ret;
 	for (auto &i: fs::recursive_directory_iterator(directory)) {
@@ -22,7 +22,7 @@ std::vector<File> File::GetFilesInDir(const std::string &directory, const std::s
 		auto parent_path = i_path.parent_path().string();
 		auto filename = i_path.filename().string();
 
-		if (std::regex rx(".*\\.(" + filter + ")$", std::regex_constants::icase); filter.empty())
+		if (std::regex rx(".*\\.(" + std::string(filter) + ")$", std::regex_constants::icase); filter.empty())
 		{
 #ifndef HAS_FILESYSTEM_LIBRARY
 			ret.emplace_back(File(parent_path, filename));

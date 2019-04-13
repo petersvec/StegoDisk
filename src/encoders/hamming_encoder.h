@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <string>
+
 #include "encoder.h"
 
 constexpr auto EncoderHammingCodeNameDef = "Hamming";
@@ -24,7 +26,7 @@ public:
   virtual int Embed(uint8 *codeword, const uint8 *data) override;
   virtual int Extract(const uint8 *codeword, uint8 *data) override;
 
-  virtual void SetArgByName(const std::string &arg, const std::string &val) override;
+  virtual void SetArgByName(std::string_view arg, std::string_view val) override;
 
   static const std::string GetName();
   virtual const std::string GetNameInstance() const override;

@@ -38,7 +38,7 @@ class CarrierFilesManager {
 public:
   CarrierFilesManager();
   ~CarrierFilesManager();
-  void LoadDirectory(const std::string &directory, const std::string &filter = "");
+  void LoadDirectory(std::string_view directory, std::string_view filter = "");
   void SaveAllFiles();
 
   uint64 GetCapacity() const;
@@ -49,9 +49,9 @@ public:
   void ApplyEncoder();
   void SetEncoder(std::shared_ptr<Encoder> encoder);
   void UnSetEncoder();
-  void SetEncoderArg(const std::string &param, const std::string &val);
+  void SetEncoderArg(std::string_view param, std::string_view val);
 
-  void SetPassword(const std::string &password);
+  void SetPassword(std::string_view password);
 
   bool LoadVirtualStorage(std::shared_ptr<VirtualStorage> storage);
   void SaveVirtualStorage();

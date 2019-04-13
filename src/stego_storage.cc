@@ -25,11 +25,11 @@ StegoStorage::StegoStorage()
 
 StegoStorage::~StegoStorage() {}
 
-void StegoStorage::Open(const std::string &storage_base_path,
-                        const std::string &password,
-						const std::string &filter) {
+void StegoStorage::Open(std::string_view storage_base_path,
+                        std::string_view password,
+						std::string_view filter /*= ""*/) {
   opened_ = false;
-  auto used_filter = filter;
+  auto used_filter = std::string(filter);
 
   if (used_filter.empty())
   {
@@ -42,9 +42,9 @@ void StegoStorage::Open(const std::string &storage_base_path,
   opened_ = true;
 }
 
-void StegoStorage::Configure(const std::string &config_path) const {
+void StegoStorage::Configure(std::string_view config_path) const {
 
-	if (std::ifstream ifs(config_path.c_str()); ifs.is_open())
+	if (std::ifstream ifs(config_path.data()); ifs.is_open())
 	{
 		std::string json_string((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 		ifs.close();
@@ -56,12 +56,12 @@ void StegoStorage::Configure(const std::string &config_path) const {
 		}
 		else
 		{
-			throw exception::ParseError{ config_path, parse_error };
+			throw exception::ParseError{ config_path.data(), parse_error };
 		}
 	}
 	else
 	{
-		throw exception::ErrorOpenFIle{ config_path };
+		throw exception::ErrorOpenFIle{ config_path.data() };
 	}
 }
 

@@ -28,8 +28,8 @@ enum class LoggerVerbosityLevel : unsigned
 class STEGO_DISK_EXPORT Logger {
 public:
   static void SetVerbosityLevel(LoggerVerbosityLevel verbosity_level,
-                                std::string out = "");
-  static void SetVerbosityLevel(std::string &verbosity_level, std::string out = "");
+                                std::string_view out = "");
+  static void SetVerbosityLevel(std::string &verbosity_level, std::string_view out = "");
   static bool ShouldPrint(LoggerVerbosityLevel verbosity_level);
   static void LoggerClose();
 

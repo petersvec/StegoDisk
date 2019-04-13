@@ -24,14 +24,14 @@ namespace stego_disk {
 class Hash final {
 public:
   Hash();
-  explicit Hash(const std::string& data);
+  explicit Hash(std::string_view data);
   Hash(const uint8* data, std::size_t length);
 
-  void Process(const std::string& data);
+  void Process(std::string_view data);
   void Process(const MemoryBuffer& data);
   void Process(const uint8* data, std::size_t length);
 
-  void Append(const std::string& data);
+  void Append(std::string_view data);
   void Append(const MemoryBuffer& data);
   void Append(const uint8* data, std::size_t length);
   const MemoryBuffer& GetState() const;

@@ -4,25 +4,12 @@
 
 namespace stego_disk
 {
-	/**
-	* Static variables
-	*/
-	observer_ptr<StegoStorage> DokanService::stego_storage_ = nullptr;
-	uint64 DokanService::capacity_ = 0;
-	std::wstring DokanService::file_path_;
-	std::wstring DokanService::mount_point_;
-	PDOKAN_OPERATIONS DokanService::operations_ = nullptr;
-	PDOKAN_OPTIONS DokanService::options_ = nullptr;
-	std::mutex DokanService::dokan_mutex_;
-	std::mutex DokanService::mount_mutex_;
-	std::condition_variable DokanService::mount_ready_;
-
 	DokanService::DokanService()
 	{
 
 	}
 
-	void DokanService::Init(observer_ptr<StegoStorage> stego_storage, const std::string &mount_point)
+	void DokanService::Init(observer_ptr<StegoStorage> stego_storage, std::string_view mount_point)
 	{
 		LOG_INFO("Initializing Dokan");
 
@@ -81,7 +68,7 @@ namespace stego_disk
 		DokanService::mount_ready_.wait(lock);
 	}
 
-	std::wstring StringToWString(const std::string &str)
+	std::wstring StringToWString(std::string_view str)
 	{
 		std::wstring temp = std::wstring(str.begin(), str.end());
 		return temp;
