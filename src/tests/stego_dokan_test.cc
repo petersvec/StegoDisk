@@ -56,6 +56,11 @@ void mount_cmd()
 			unmount_virtualdisc();
 			stego_storage->Save();
 			stego_disk::DokanService::Unmount();
+			exit(0);
+		}
+		else
+		{
+			std::cout << "Unrecognized command!" << std::endl;
 		}
 	}
 }
