@@ -58,6 +58,7 @@ namespace stego_disk
 		inline static uint64 capacity_{ 0 };
 		inline static std::wstring file_path_;
 		inline static std::wstring mount_point_;
+		inline static std::wstring file_name_;
 		inline static PDOKAN_OPERATIONS operations_{ nullptr };
 		inline static PDOKAN_OPTIONS options_{ nullptr };
 		inline static std::mutex dokan_mutex_;

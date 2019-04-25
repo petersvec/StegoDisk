@@ -23,6 +23,7 @@ void commands_help()
 	std::cout << "help\t\tShow this help message" << std::endl;
 	std::cout << "mount\t\tMount virtualdisc.iso file" << std::endl;
 	std::cout << "unmount\t\tUnmount virtualdisc.iso file and exit" << std::endl;
+	std::cout << "exit\t\tExit" << std::endl;
 } 
 
 void mount_virtualdisc()
@@ -54,6 +55,12 @@ void mount_cmd()
 		else if (command == "unmount")
 		{
 			unmount_virtualdisc();
+			stego_storage->Save();
+			stego_disk::DokanService::Unmount();
+			exit(0);
+		}
+		else if (command == "exit")
+		{
 			stego_storage->Save();
 			stego_disk::DokanService::Unmount();
 			exit(0);

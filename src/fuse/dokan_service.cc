@@ -13,8 +13,8 @@ namespace stego_disk
 	{
 		LOG_INFO("Initializing Dokan");
 
-		const std::string path = "virtualdisc.iso";
-		DokanService::file_path_ = std::wstring(path.begin(), path.end());
+		DokanService::file_path_ = StringToWString("\\virtualdisc.iso");
+		DokanService::file_name_ = StringToWString("virtualdisc.iso");
 
 		if (stego_storage)
 		{
@@ -130,9 +130,9 @@ namespace stego_disk
 			file_info.ftLastWriteTime = file_time;
 
 			auto i{ 0u };
-			for (i = 0u; i < DokanService::file_path_.size(); i++)
+			for (i = 0u; i < DokanService::file_name_.size(); i++)
 			{
-				file_info.cFileName[i] = DokanService::file_path_[i];
+				file_info.cFileName[i] = DokanService::file_name_[i];
 			}
 			file_info.cFileName[i] = '\0';
 
@@ -188,6 +188,7 @@ namespace stego_disk
 			LOG_DEBUG("File: " + std::string(DokanService::file_path_.begin(), DokanService::file_path_.end()) +
 					  " offset: " + std::to_string(offset64) + 
 					  " size: " + std::to_string(size64));
+			*ReadLength = 0;
 			return STATUS_END_OF_FILE;
 		}
 
@@ -203,6 +204,7 @@ namespace stego_disk
 
 		// try catch?
 		DokanService::stego_storage_->Read(Buffer, offset64, size64);
+		*ReadLength = size64;
 
 		return STATUS_SUCCESS;
 	}
@@ -226,6 +228,7 @@ namespace stego_disk
 			LOG_DEBUG("File: " + std::string(DokanService::file_path_.begin(), DokanService::file_path_.end()) +
 				" offset: " + std::to_string(offset64) +
 				" size: " + std::to_string(size64));
+			*NumberOfBytesWritten = 0;
 			return STATUS_END_OF_FILE;
 		}
 
@@ -241,6 +244,7 @@ namespace stego_disk
 
 		// try catch?
 		DokanService::stego_storage_->Write(Buffer, offset64, size64);
+		*NumberOfBytesWritten = size64;
 
 		return STATUS_SUCCESS;
 	}
