@@ -53,12 +53,13 @@ namespace stego_disk
 		StreamType GetStreamType(int type) const;
 		std::string GetStreamStr(StreamType type) const;
 		void SetStreamParameters(AVStream *input, AVStream *output) const;
+		bool BFrameDetection();
 	private:
 		std::string file_name_{ "" };
 		AVFormatContext *input_context_{ nullptr };
 		AVFormatContext *output_context_{ nullptr };
 		std::vector<PacketUPtr> data_;
 		StreamData stream_data_;
-		bool has_b_frames{ false };
+		bool has_b_frames_{ false };
 	};
 }

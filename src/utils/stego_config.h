@@ -31,6 +31,7 @@ public:
     Instance().global_perm_ = PermutationFactory::GetPermutationType(config["glob_perm"].ToString());
     Instance().local_perm_ = PermutationFactory::GetPermutationType(config["local_perm"].ToString());
     Instance().stego_config_loaded_ = true;
+	Instance().ffprobe_path_ = config["ffprobe_path"].ToString();
 
     if(config["include_types"].IsArray()) {
       json::JsonObject include_list = config["include_types"];
@@ -55,6 +56,7 @@ public:
     }
   }
 
+  inline static std::string ffprobe_path() { return Instance().ffprobe_path_; }
   inline static PermutationFactory::PermutationType &global_perm() { return Instance().global_perm_; }
   inline static PermutationFactory::PermutationType &local_perm() { return Instance().local_perm_; }
   inline static EncoderFactory::EncoderType &encoder() { return Instance().encoder_; }
@@ -77,6 +79,7 @@ private:
   }
 
   bool stego_config_loaded_{ false };
+  std::string ffprobe_path_{ "" };
   EncoderFactory::EncoderType encoder_;
   PermutationFactory::PermutationType global_perm_;
   PermutationFactory::PermutationType local_perm_;

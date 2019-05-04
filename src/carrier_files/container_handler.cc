@@ -1,6 +1,9 @@
 #include "container_handler.h"
 #include "utils/exceptions.h"
 #include "logging/logger.h"
+#include "utils/stego_config.h"
+
+#include <fstream>
 
 namespace stego_disk
 {
@@ -34,6 +37,8 @@ namespace stego_disk
 	{
 		LOG_INFO("Loading container: " + file_name_);
 
+		auto ret = this->BFrameDetection();
+
 		while (true)
 		{
 			auto packet = std::make_unique<AVPacket>();
@@ -56,16 +61,17 @@ namespace stego_disk
 			// in same cases difference could be 1, even without B frames
 			// therefore if difference between pts and dts is 2 and larger,
 			// we can guess that codec uses B frames
-			if (stream_type == StreamType::Video && std::abs(packet->pts - packet->dts) >= 2)
+			// !!! only if we have no ffprobe specified in configuration file or ffprobe failed
+			if ((StegoConfig::ffprobe_path().empty() || !ret) && stream_type == StreamType::Video && std::abs(packet->pts - packet->dts) >= 2)
 			{
-				has_b_frames = true;
+				has_b_frames_ = true;
 			}
 
 			data_.emplace_back(std::move(packet));
 			stream_data_[stream_type].emplace_back(std::ref(*data_.back()));
 		}
 
-		LOG_DEBUG("B frames detected: " + std::to_string(this->has_b_frames));
+		LOG_DEBUG("B frames detected: " + std::to_string(this->has_b_frames_));
 	}
 
 	void ContainerHandler::Save()
@@ -129,7 +135,7 @@ namespace stego_disk
 
 	bool ContainerHandler::HasBFrames() const
 	{
-		return has_b_frames;
+		return has_b_frames_;
 	}
 
 	stego_disk::StreamData& ContainerHandler::GetStreamData()
@@ -231,5 +237,36 @@ namespace stego_disk
 		output->nb_frames = input->nb_frames;
 		output->r_frame_rate = input->r_frame_rate;
 		output->start_time = input->start_time;
+	}
+
+	bool ContainerHandler::BFrameDetection()
+	{
+		if (!StegoConfig::ffprobe_path().empty())
+		{
+			auto command = StegoConfig::ffprobe_path() + " -show_frames -read_intervals \"\%+#30\" " + file_name_ + " > out.txt";
+			
+			std::ofstream tmp("out.txt");
+			tmp.close();
+
+			if (auto ret = system(command.c_str()); ret == 0)
+			{
+				std::ifstream input("out.txt");
+				std::string result((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+				input.close();
+
+				if (result.find("pict_type=B", 0) != std::string::npos)
+				{
+					has_b_frames_ = true;
+				}
+				else
+				{
+					has_b_frames_ = false;
+				}
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
