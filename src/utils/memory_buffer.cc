@@ -14,6 +14,7 @@
 #include <exception>
 #include <stdexcept>
 #include <random>
+#include <array>
 
 #include "api_mask.h"
 #include "stego_types.h"
@@ -216,7 +217,10 @@ void MemoryBuffer::Randomize()
 	memset(buffer_, 0, size_);
 
 	std::random_device rnd;
-	auto generator = std::mt19937{ rnd() };
+	std::array<int, std::mt19937::state_size> seed{};
+	std::generate(std::begin(seed), std::end(seed), std::ref(rnd));
+	std::seed_seq seed_seq(std::begin(seed), std::end(seed));
+	auto generator = std::mt19937{ seed_seq };
 
 	for (auto i = 0u; i < size_; i++)
 	{
