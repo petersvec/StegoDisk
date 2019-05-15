@@ -3,7 +3,7 @@
 * @author Martin Kosdy
 * @author Matus Kysel
 * @date 2016
-* @brief Memofry buffer implementation
+* @brief Memory buffer implementation
 *
 */
 
@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <exception>
 #include <stdexcept>
-#include <ctime>
+#include <random>
 
 #include "api_mask.h"
 #include "stego_types.h"
@@ -206,17 +206,22 @@ void MemoryBuffer::Clear() {
   memset(buffer_, 0, size_);
 }
 
-void MemoryBuffer::Randomize() {
+void MemoryBuffer::Randomize() 
+{
+	if ((buffer_ == nullptr) || (size_ == 0))
+	{
+		return;
+	}
+	
+	memset(buffer_, 0, size_);
 
-  if ((buffer_ == nullptr) || (size_ == 0)) return;
+	std::random_device rnd;
+	auto generator = std::mt19937{ rnd() };
 
-  memset(buffer_, 0, size_);
-  memset(buffer_, 0xFF, size_); //TODO(Matus) naco je toto dobre
-
-  srand(static_cast<unsigned int>(time(nullptr)));
-  for (std::size_t i = 0; i < size_; ++i) {
-    buffer_[i] = static_cast<uint8>(rand()); //PSTODO naozaj? nepiseme nahodou kniznicu ktora sluzi na security...?
-  }
+	for (auto i = 0u; i < size_; i++)
+	{
+		buffer_[i] = static_cast<uint8>(generator());
+	}
 }
 
 void MemoryBuffer::Fill(uint8 value) {
