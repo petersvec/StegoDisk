@@ -46,6 +46,11 @@ Hash::Hash(const uint8* data, std::size_t length) {
   Process(data, length);
 }
 
+Hash::~Hash()
+{
+
+}
+
 void Hash::Process(std::string_view data) {
   if (default_hash_impl_ == nullptr)
     throw exception::MissingDefault{"hash implementation"};

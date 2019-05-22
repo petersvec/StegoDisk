@@ -149,7 +149,7 @@ uint64 CarrierFile::GetRawCapacity() {
   return raw_capacity_;
 }
 
-void CarrierFile::SetSubkey(Key& subkey) 
+void CarrierFile::SetSubkey(const Key& subkey) 
 {
 	this->subkey_ = std::make_unique<Key>(subkey.GetData());
 }

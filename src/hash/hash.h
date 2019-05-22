@@ -26,6 +26,7 @@ public:
   Hash();
   explicit Hash(std::string_view data);
   Hash(const uint8* data, std::size_t length);
+  ~Hash();
 
   void Process(std::string_view data);
   void Process(const MemoryBuffer& data);

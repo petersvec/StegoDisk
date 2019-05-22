@@ -38,7 +38,7 @@ public:
   Key operator^(const Key& other);
 
 private:
-	std::unique_ptr<MemoryBuffer> data_{ nullptr };
+	std::unique_ptr<MemoryBuffer> data_;
 };
 } // stego_disk
 

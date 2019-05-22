@@ -23,8 +23,8 @@
 #include "virtual_storage/virtual_storage.h"
 #include "keys/key.h"
 #include "hash/hash.h"
-#include "utils/thread_pool.h"
 #include "utils/memory_buffer.h"
+#include "utils/thread_pool.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -114,24 +114,24 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
   try { storage->ApplyPermutation(this->GetCapacity(), *master_key_); }
   catch (...) { throw; }
 
-  for (const auto &file : carrier_files_) 
+  for (const auto &file : carrier_files_)
   {
 	  uint64 offset = 0;
 	  uint64 bytes_used;
-	  
-	  if (auto remaining_capacity = storage->GetRawCapacity(); remaining_capacity > file->GetCapacity()) 
+
+	  if (auto remaining_capacity = storage->GetRawCapacity(); remaining_capacity > file->GetCapacity())
 	  {
 		  remaining_capacity -= file->GetCapacity();
 		  bytes_used = file->GetCapacity();
       }
-	  else 
+	  else
 	  {
 		  bytes_used = remaining_capacity;
 		  remaining_capacity = 0;
 	  }
 
 	  file->AddToVirtualStorage(storage, offset, bytes_used);
-      offset += file->GetCapacity();	
+      offset += file->GetCapacity();
   }
 
   std::vector<std::future<void>> load_results;
@@ -146,7 +146,7 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
   }
 
   try {
-    if (virtual_storage_ = storage; virtual_storage_->IsValidChecksum() == false ) 
+    if (virtual_storage_ = storage; virtual_storage_->IsValidChecksum() == false )
 	{
       LOG_DEBUG("Data integrity test: checksum is NOT valid");
       return false;
@@ -309,7 +309,8 @@ void CarrierFilesManager::DeriveSubkeys() {
     hash.Append(std::to_string(i));
     hash.Append(carrier_files_[i]->GetFile().GetNormalizedPath());
 
-    carrier_files_[i]->SetSubkey(Key(hash.GetState()));
+    auto key = Key(hash.GetState());
+    carrier_files_[i]->SetSubkey(key);
 
     LOG_DEBUG("CarrierFilesManager::deriveSubkeys: subkey for carrier '"
               << carrier_files_[i]->GetFile().GetAbsolutePath() << "' is " <<

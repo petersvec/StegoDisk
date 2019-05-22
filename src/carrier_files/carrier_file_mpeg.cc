@@ -21,6 +21,11 @@ namespace stego_disk
 		LOG_DEBUG("File: " + file.GetAbsolutePath() + " raw capacity: " + std::to_string(raw_capacity_));
 	}
 
+	CarrierFileMPEG::~CarrierFileMPEG()
+	{
+
+	}
+
 	void CarrierFileMPEG::LoadFile()
 	{
 		LOG_INFO("Loading mpeg carrier file: " + this->GetFile().GetAbsolutePath());
@@ -116,7 +121,7 @@ namespace stego_disk
 					size += static_cast<uint64>(stream_data.at(StreamType::Video).size());
 				}
 			}
-			
+
 			if (stream_data.find(StreamType::Audio) != stream_data.end())
 			{
 				size += static_cast<uint64>(stream_data.at(StreamType::Audio).size());
@@ -194,7 +199,7 @@ namespace stego_disk
 
 		std::size_t buffer_offset{ 0u };
 		auto &stream_data = container_handler_->GetStreamData();
-		
+
 		// saving into video stream
 		if (stream_data.find(StreamType::Video) != stream_data.end())
 		{
@@ -284,7 +289,7 @@ namespace stego_disk
 		LOG_TRACE("Packet after, pts: " + std::to_string(packet.pts) +
 			"dts: " + std::to_string(packet.dts) +
 			"stream index: " + std::to_string(packet.stream_index));
-		
+
 		if (offset == buffer.GetSize())
 		{
 			return false;

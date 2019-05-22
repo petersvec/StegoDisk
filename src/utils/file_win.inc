@@ -65,12 +65,12 @@ static void AddFilesInDir(std::string basePath, std::string currentPath, std::st
     }
     do
     {
-      std::string newCurrentPath = currentPath + "\\" + string(ffd.cFileName);
+      std::string newCurrentPath = currentPath + "\\" + std::string(ffd.cFileName);
       std::string newPath = basePath + newCurrentPath;
 
       if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
       {
-        if ((string(ffd.cFileName) != ".") && (string(ffd.cFileName) != ".."))
+        if ((std::string(ffd.cFileName) != ".") && (std::string(ffd.cFileName) != ".."))
           AddFilesInDir(basePath, newCurrentPath, mask, fileList);
       }
       else
@@ -91,13 +91,13 @@ static void AddFilesInDir(std::string basePath, std::string currentPath, std::st
  }
 
   // TODO: add wildcard parameter to specify supported file extensions (*.bmp, *.jpg ...)
-  std::vector<File> File::GetFilesInDir(std::string path, std::string mask)
+  std::vector<File> File::GetFilesInDir(std::string_view path, std::string_view mask)
   {
     std::vector<File> fileList;
 	if (mask.empty())
 		mask = "*";
 
-    AddFilesInDir(path, "", mask, fileList);
+    AddFilesInDir(path.data(), "", mask.data(), fileList);
 
     return fileList;
   }

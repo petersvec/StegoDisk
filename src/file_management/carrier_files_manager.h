@@ -38,6 +38,7 @@ class CarrierFilesManager {
 public:
   CarrierFilesManager();
   ~CarrierFilesManager();
+
   void LoadDirectory(std::string_view directory, std::string_view filter = "");
   void SaveAllFiles();
 
@@ -68,11 +69,11 @@ private:
   uint64 capacity_{ 0 };
   uint64 files_in_directory_{ 0 };
 
-  std::unique_ptr<Hash> password_hash_{ nullptr };
-  std::unique_ptr<Key> master_key_{ nullptr };
+  std::unique_ptr<Hash> password_hash_;
+  std::unique_ptr<Key> master_key_;
   std::shared_ptr<VirtualStorage> virtual_storage_{ nullptr };
   std::shared_ptr<Encoder> encoder_{ nullptr };
-  std::unique_ptr<ThreadPool> thread_pool_{ nullptr };
+  std::unique_ptr<ThreadPool> thread_pool_;
   bool is_active_encoder_{ false };
 };
 

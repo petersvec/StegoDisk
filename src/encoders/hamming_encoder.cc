@@ -14,6 +14,7 @@
 #include "utils/stego_math.h"
 
 #include <algorithm>
+#include <cstring>
 
 namespace stego_disk {
 

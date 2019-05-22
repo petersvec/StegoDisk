@@ -23,13 +23,18 @@ namespace stego_disk
 		LOG_DEBUG("File: " + file.GetAbsolutePath() + " raw capacity: " + std::to_string(raw_capacity_));
 	}
 
+	CarrierFileMKV::~CarrierFileMKV()
+	{
+
+	}
+
 	void CarrierFileMKV::LoadFile()
 	{
 		LOG_INFO("Loading mkv carrier file: " + this->GetFile().GetAbsolutePath());
 
 		if (container_handler_)
 		{
-			auto data_buffer = MemoryBuffer(); 
+			auto data_buffer = MemoryBuffer();
 			this->LoadBuffer(data_buffer);
 
 			buffer_->Resize(static_cast<std::size_t>(raw_capacity_));

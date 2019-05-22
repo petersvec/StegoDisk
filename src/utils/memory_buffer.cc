@@ -15,6 +15,7 @@
 #include <stdexcept>
 #include <random>
 #include <array>
+#include <functional>
 
 #include "api_mask.h"
 #include "stego_types.h"
@@ -27,8 +28,8 @@ void MemoryBuffer::Init(std::size_t new_size) {
   if (size_ = new_size; size_ > 0)
   {
     buffer_ = new uint8[size_];
-  } 
-  else 
+  }
+  else
   {
     size_ = 0;
     buffer_ = nullptr;
@@ -124,7 +125,7 @@ void MemoryBuffer::Resize(std::size_t new_size) {
   auto* new_buffer = new uint8[new_size];
 
   memset(new_buffer, 0, new_size);
-  if (uint8* original_buffer = buffer_; original_buffer != nullptr) 
+  if (uint8* original_buffer = buffer_; original_buffer != nullptr)
   {
 	  std::size_t original_size = size_;
 	  memcpy(new_buffer, original_buffer, std::min(new_size, original_size));
@@ -207,13 +208,13 @@ void MemoryBuffer::Clear() {
   memset(buffer_, 0, size_);
 }
 
-void MemoryBuffer::Randomize() 
+void MemoryBuffer::Randomize()
 {
 	if ((buffer_ == nullptr) || (size_ == 0))
 	{
 		return;
 	}
-	
+
 	memset(buffer_, 0, size_);
 
 	std::random_device rnd;

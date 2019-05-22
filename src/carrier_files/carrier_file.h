@@ -84,7 +84,7 @@ protected:
   int ExtractBufferUsingEncoder();
   int EmbedBufferUsingEncoder();
 
-  std::unique_ptr<MemoryBuffer> buffer_{ nullptr };
+  std::unique_ptr<MemoryBuffer> buffer_;
   uint32 width_{ 0 };
   uint32 height_{ 0 };
   bool is_grayscale_{ false };
@@ -96,11 +96,11 @@ protected:
   uint32 blocks_used_{ 0 };
   uint64 virtual_storage_offset_{ 0 };
   bool file_loaded_{ false };
-  std::unique_ptr<Key> subkey_{ nullptr };
+  std::unique_ptr<Key> subkey_;
   File file_;
   std::shared_ptr<Encoder> encoder_{ nullptr };
   std::shared_ptr<Permutation> permutation_{ nullptr };
-  std::unique_ptr<Fitness> fitness_{ nullptr };
+  std::unique_ptr<Fitness> fitness_;
   std::shared_ptr<VirtualStorage> virtual_storage_{ nullptr };
 };
 

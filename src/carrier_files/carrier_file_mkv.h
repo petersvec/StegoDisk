@@ -19,6 +19,7 @@ namespace stego_disk
 	class CarrierFileMKV : public CarrierFile {
 	public:
 		CarrierFileMKV(File file, std::shared_ptr<Encoder> encoder, std::shared_ptr<Permutation> permutation, std::unique_ptr<Fitness> fitness);
+		~CarrierFileMKV();
 
 		virtual void LoadFile() override;
 		virtual void SaveFile() override;
@@ -27,6 +28,6 @@ namespace stego_disk
 		void LoadBuffer(MemoryBuffer &buffer);
 		void SaveBuffer(const MemoryBuffer &buffer);
 	private:
-		std::unique_ptr<ContainerHandler> container_handler_{ nullptr };
+		std::unique_ptr<ContainerHandler> container_handler_;
 	};
 }

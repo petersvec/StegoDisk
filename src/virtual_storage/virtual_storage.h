@@ -69,7 +69,7 @@ private:
 	bool   is_set_global_permutation_{ false };
 	uint64 raw_capacity_{ 0 };               // raw capacity (hash + storage)
 	uint64 usable_capacity_{ 0 };          // usable capacity (storage only)
-	std::unique_ptr<MemoryBuffer> data_{ nullptr };
+	std::unique_ptr<MemoryBuffer> data_;
 };
 
 } // stego_disk

@@ -21,6 +21,7 @@ namespace stego_disk
 	class CarrierFileMPEG : public CarrierFile {
 	public:
 		CarrierFileMPEG(File file, std::shared_ptr<Encoder> encoder, std::shared_ptr<Permutation> permutation, std::unique_ptr<Fitness> fitness);
+		~CarrierFileMPEG();
 
 		virtual void LoadFile() override;
 		virtual void SaveFile() override;
@@ -33,6 +34,6 @@ namespace stego_disk
 		uint64 ModifyLSB(uint64 value, uint64 lsb) const;
 		std::tuple<uint64, uint64, uint64> GetTestValues(const AVPacket &packet) const;
 	private:
-		std::unique_ptr<ContainerHandler> container_handler_{ nullptr };
+		std::unique_ptr<ContainerHandler> container_handler_;
 	};
 }
