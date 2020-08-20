@@ -144,7 +144,6 @@ namespace stego_disk
 		buffer.Clear();
 
 		std::size_t buffer_offset{ 0u };
-		uint8 current_byte{ 0u };
 		auto &stream_data = container_handler_->GetStreamData();
 
 		// loading from video stream
