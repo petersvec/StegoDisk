@@ -114,12 +114,13 @@ bool CarrierFilesManager::LoadVirtualStorage(std::shared_ptr<VirtualStorage> sto
   try { storage->ApplyPermutation(this->GetCapacity(), *master_key_); }
   catch (...) { throw; }
 
-  for (const auto &file : carrier_files_)
+  uint64 offset = 0;
+  uint64 remaining_capacity = storage->GetRawCapacity();
+  for (const auto &file : carrier_files_) 
   {
-	  uint64 offset = 0;
 	  uint64 bytes_used;
 
-	  if (auto remaining_capacity = storage->GetRawCapacity(); remaining_capacity > file->GetCapacity())
+	  if (remaining_capacity > file->GetCapacity())
 	  {
 		  remaining_capacity -= file->GetCapacity();
 		  bytes_used = file->GetCapacity();
