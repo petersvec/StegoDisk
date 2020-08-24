@@ -5,6 +5,7 @@ include(GenerateExportHeader)
 option(VERSION_NAMES "Append version into binary/library name" OFF)
 option(WITH_FUSE "Build this library with FUSE" OFF)
 option(WITH_DOKAN "Build this library with DOKAN" OFF)
+option(WITH_FFMPEG "Build this library with FFMPEG (.mkv and .mp4 carrier files support)" OFF)
 option(BUILD_SHARED "Build this as shared library" OFF)
 option(BUILD_TESTS "Whether to build automatic test suite" ON)
 option(OBFUSCATE_SYMBOLS "Whether to change names in syblols to inocent strings" OFF)
@@ -14,10 +15,10 @@ set(OBFUSCATE_PROJECT "RansomwareNG" CACHE STRING "Name of the project")
 set(OBFUSCATE_LIBRARY "enc-lib2" CACHE STRING "Name of the library")
 
 if(NOT OBFUSCATE_SYMBOLS)
-	set(OBFUSCATE_NAMESPACE "stego_disk")
-	set(OBFUSCATE_STORAGE "StegoStorage")
-	set(OBFUSCATE_PROJECT "StegoDisk")
-	set(OBFUSCATE_LIBRARY "stego-disk")
+  set(OBFUSCATE_NAMESPACE "stego_disk")
+  set(OBFUSCATE_STORAGE "StegoStorage")
+  set(OBFUSCATE_PROJECT "StegoDisk")
+  set(OBFUSCATE_LIBRARY "stego-disk")
 endif()
 
 project(${OBFUSCATE_PROJECT} CXX)
@@ -37,11 +38,11 @@ set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 if(NOT WIN32)
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib)
 else()
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+  set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
+  set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 endif()
 
 set(STEGODISK_MAJOR_VERSION 0)
@@ -60,8 +61,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version.h.in ${CMAKE_BINARY_DIR}/
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/api_mask.h.in ${CMAKE_BINARY_DIR}/src/api_mask.h)
 include_directories(${CMAKE_BINARY_DIR}/src) #this is for version.h file
 include_directories(${CMAKE_BINARY_DIR}) #this is for stego-disk_export.h file
-
-
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -132,16 +131,23 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg-turbo)
 
 ################ FUSE ##################
 if(WITH_FUSE)
-  find_package(FUSE)
+  if(WIN32)
+    message(FATAL_ERROR
+      "option -DWITH_FUSE cannot be used on Windows; use -DWITH_DOKAN "
+      "instead")
+  endif(WIN32)
+
+  find_package(FUSE REQUIRED)
   if(NOT FUSE_FOUND)
-    message (STATUS "Unable to find fuse.h")
-  else()
+    message (SEND_ERROR "Unable to find FUSE dev package (fuse.h)")
+  else(NOT FUSE_FOUND)
+    message(STATUS "Build this library with FUSE support")
     include_directories(${FUSE_INCLUDE_DIRS})
-  endif()
-else()
+  endif(NOT FUSE_FOUND)
+else(WITH_FUSE)
   message (STATUS "Build this library without FUSE")
- set(FUSE_FOUND FALSE)
-endif()
+  set(FUSE_FOUND FALSE)
+endif(WITH_FUSE)
 ################ FUSE ##################
 
 ################ LodePNG ##################
@@ -150,24 +156,45 @@ set(LODEPNG_SRC ${CMAKE_CURRENT_SOURCE_DIR}/lib/lodepng/lodepng.cpp ${CMAKE_CURR
 ################ LodePNG ##################
 
 ################ FFMPEG ##################
-find_path(FFMPEG_INCLUDE_DIR ffmpeg/include)
-
-find_library(AVCODEC_LIBRARY avcodec)
-find_library(AVFORMAT_LIBRARY avformat)
-find_library(AVUTIL_LIBRARY avutil)
-
-include_directories(${FFMPEG_INCLUDE_DIR})
-link_libraries(${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVUTIL_LIBRARY})
+if(WITH_FFMPEG)
+  find_package(FFMPEG COMPONENTS avcodec avformat avutil)
+  if(NOT FFMPEG_FOUND)
+    message(SEND_ERROR "Unable to find FFMPEG package")
+    set(WITH_FFMPEG FALSE)
+  else(NOT FFMPEG_FOUND)
+    message(STATUS
+      "Build this library with FFMPEG support:\n"
+      "\tcarrier_files .mp4\n\tcarrier_files .mkv")
+    include_directories(${FFMPEG_INCLUDE_DIRS})
+    link_libraries(${FFMPEG_LIBRARIES})
+    # carrier_file_factory.cc contains WITH_FFMPEG dependency code:
+    # If 'cmake -DWITH_FFMPEG=ON .' command is involved after
+    # 'cmake .', carrier_file_factory.cc is not recompiled.
+    # To avoid this problem, atime/mtime of this file will be
+    # updated.
+    file(TOUCH_NOCREATE src/carrier_files/carrier_file_factory.cc)
+  endif(NOT FFMPEG_FOUND)
+else(WITH_FFMPEG)
+  message(STATUS "Build this library without FFMPEG")
+  set(FFMPEG_FOUND FALSE)
+endif(WITH_FFMPEG)
 ################ FFMPEG ##################
 
 ################ DOKAN ##################
-if(WITH_DOKAN AND WIN32)
-	find_path(DOKAN_INCLUDE_DIR dokan/include)
-	find_library(DOKAN_LIBRARY dokan)
+if(WITH_DOKAN)
+  message(WITH_DOKAN=${WITH_DOKAN})
+  if(NOT WIN32)
+    message(FATAL_ERROR
+      "option -DWITH_DOKAN can be used only on Windows; use -DWITH_FUSE "
+      "on UNIX-like systems")
+  endif(NOT WIN32)
+
+  find_path(DOKAN_INCLUDE_DIR dokan/include)
+  find_library(DOKAN_LIBRARY dokan)
 	
-	include_directories(${DOKAN_INCLUDE_DIR})
-	link_libraries(${DOKAN_LIBRARY})
-endif()
+  include_directories(${DOKAN_INCLUDE_DIR})
+  link_libraries(${DOKAN_LIBRARY})
+endif(WITH_DOKAN)
 ################ DOKAN ##################
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src) #this makes src root dir
@@ -185,9 +212,6 @@ set(CARRIER_FILES_HDRS
   src/carrier_files/carrier_file_factory.h
   src/carrier_files/carrier_file_jpeg.h
   src/carrier_files/carrier_file_png.h
-  src/carrier_files/carrier_file_mkv.h
-  src/carrier_files/carrier_file_mpeg.h
-  src/carrier_files/container_handler.h
 )
 
 set(CARRIER_FILES_SRCS
@@ -196,10 +220,22 @@ set(CARRIER_FILES_SRCS
   src/carrier_files/carrier_file_factory.cc
   src/carrier_files/carrier_file_jpeg.cc
   src/carrier_files/carrier_file_png.cc
-  src/carrier_files/carrier_file_mkv.cc
-  src/carrier_files/carrier_file_mpeg.cc
-  src/carrier_files/container_handler.cc
 )
+
+if(FFMPEG_FOUND)
+  set(CARRIER_FILES_HDRS
+    ${CARRIER_FILES_HDRS}
+    src/carrier_files/carrier_file_mkv.h
+    src/carrier_files/carrier_file_mpeg.h
+    src/carrier_files/container_handler.h
+  )
+  set(CARRIER_FILES_SRCS
+    ${CARRIER_FILES_SRCS}
+    src/carrier_files/carrier_file_mkv.cc
+    src/carrier_files/carrier_file_mpeg.cc
+    src/carrier_files/container_handler.cc
+  )
+endif()
 
 # ENCODERS
 
