@@ -119,7 +119,7 @@ int FuseService::MountFuse(const std::string &mount_point) {
   char *argv[10];
   memset(argv, 0, 10 * sizeof(char*));
 
-  char *mnt_pt = new (nothrow) char[mount_point_.size() + 1];
+  char *mnt_pt = new (std::nothrow) char[mount_point_.size() + 1];
   if (!mnt_pt) {
     return -1;
   }

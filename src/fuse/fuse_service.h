@@ -26,6 +26,7 @@
 #include "logging/logger.h"
 #include "stego-disk_export.h"
 #include "stego_storage.h"
+#include "utils/stego_types.h"
 
 static struct fuse_operations stegofs_ops;
 

@@ -107,8 +107,8 @@ int main(int argc, char *argv[]) {
     std::cout << dir << std::endl;
     dir = DST_DIRECTORY + dir;
     std::cout << dir << std::endl;
-    FileManager::RemoveDirectory(dir);
-    FileManager::CopyDirectory(SRC_DIRECTORY, dir);
+    FileManager::RemoveDir(dir);
+    FileManager::CopyDir(SRC_DIRECTORY, dir);
   }
   if (dir.empty()) {
     LOG_ERROR("directory was not set");
@@ -156,9 +156,9 @@ int main(int argc, char *argv[]) {
   stego_storage->Save();
   FuseService::UnmountFuse(DST_DIRECTORY);
 
-  if(test_directory) FileManager::RemoveDirectory(dir);
+  if(test_directory) FileManager::RemoveDir(dir);
 
-  FileManager::RemoveDirectory(input_file);
+  FileManager::RemoveDir(input_file);
 
   if (input != output) {
     LOG_ERROR("Not equal! Input size: " << input.size() <<
